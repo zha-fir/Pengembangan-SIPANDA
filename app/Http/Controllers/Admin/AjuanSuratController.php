@@ -4,137 +4,171 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AjuanSurat;
-use App\Models\KK; // Kita perlu ini untuk ambil data KK
+use App\Models\PejabatDesa; // <-- Gunakan model baru
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // Untuk mengakses file template
-use PhpOffice\PhpWord\TemplateProcessor; // <--- INI PENTING
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpWord\TemplateProcessor;
+use Carbon\Carbon; // <-- Kita butuh ini untuk format tanggal
 
 class AjuanSuratController extends Controller
 {
     /**
-     * Menampilkan daftar ajuan surat yang masih 'BARU'.
+     * Halaman "Ajuan Surat Masuk" (Hanya status BARU).
      */
     public function index()
     {
-        // Ambil data ajuan, tapi hanya yang statusnya 'BARU'
-        // 'with' untuk eager loading (mengambil data relasi Warga dan JenisSurat)
         $ajuanList = AjuanSurat::with('warga', 'jenisSurat')
                                 ->where('status', 'BARU')
-                                ->orderBy('tanggal_ajuan', 'asc') // Tampilkan yang paling lama di atas
+                                ->orderBy('tanggal_ajuan', 'asc')
                                 ->get();
 
-        return view('admin.ajuan-surat.index', [
-            'ajuanList' => $ajuanList
-        ]);
+        // Ambil daftar pejabat untuk dropdown di modal
+        $pejabatList = PejabatDesa::all();
+
+        return view('admin.ajuan-surat.index', compact('ajuanList', 'pejabatList'));
     }
 
     /**
-     * Menampilkan halaman arsip (surat SELESAI atau DITOLAK).
+     * Halaman "Arsip Surat" (Hanya status SELESAI atau DITOLAK).
      */
     public function arsip()
     {
-        // Ambil data ajuan yang sudah tidak 'BARU'
-        $arsipList = AjuanSurat::with('warga', 'jenisSurat')
+        $arsipList = AjuanSurat::with('warga', 'jenisSurat', 'pejabatDesa') // <-- Ganti ke pejabatDesa
                                 ->whereIn('status', ['SELESAI', 'DITOLAK'])
-                                ->orderBy('tanggal_ajuan', 'desc') // Tampilkan yang terbaru di atas
+                                ->orderBy('tanggal_ajuan', 'desc')
                                 ->get();
 
-        return view('admin.ajuan-surat.arsip', [
-            'arsipList' => $arsipList
-        ]);
+        return view('admin.ajuan-surat.arsip', compact('arsipList'));
     }
 
-    // ... (method index() dan arsip() yang sudah ada) ...
-
-/**
- * Memproses ajuan, men-generate surat, dan men-download file.
- */
-    public function prosesAjuan(AjuanSurat $ajuan)
+    /**
+     * Aksi: Konfirmasi ajuan dari modal.
+     */
+    public function konfirmasiAjuan(Request $request, AjuanSurat $ajuan)
     {
-        // 1. Ambil data yang diperlukan
-        // Kita pakai 'find' untuk memastikan data terbaru (terutama relasinya)
-        $ajuan = AjuanSurat::with('warga.kk.dusun', 'jenisSurat')->find($ajuan->id_ajuan);
+        $request->validate([
+            'nomor_surat' => 'required|string|max:100',
+            'id_pejabat_desa' => 'required|integer|exists:tabel_pejabat_desa,id_pejabat_desa', // <-- Cek ke tabel baru
+        ]);
 
-        if (!$ajuan) {
-            return redirect()->route('ajuan-surat.index')->with('error', 'Ajuan tidak ditemukan.');
+        $ajuan->nomor_surat = $request->nomor_surat;
+        $ajuan->id_pejabat_desa = $request->id_pejabat_desa; // <-- Simpan id pejabat
+        $ajuan->status = 'SELESAI'; // Langsung ubah jadi SELESAI
+        $ajuan->catatan_penolakan = null; // Bersihkan catatan (jika ada)
+        $ajuan->save();
+
+        return Redirect::route('ajuan-surat.index')->with('success', 'Ajuan berhasil dikonfirmasi dan dipindahkan ke arsip.');
+    }
+
+    /**
+     * Aksi: Tolak ajuan dari modal.
+     */
+    public function tolakAjuan(Request $request, AjuanSurat $ajuan)
+    {
+        $request->validate([
+            'catatan_penolakan' => 'required|string|max:255',
+        ]);
+
+        $ajuan->catatan_penolakan = $request->catatan_penolakan;
+        $ajuan->status = 'DITOLAK';
+        $ajuan->nomor_surat = null; // Pastikan data surat kosong
+        $ajuan->id_pejabat_desa = null;
+        $ajuan->save();
+
+        return Redirect::route('ajuan-surat.index')->with('success', 'Ajuan telah ditolak dan dipindahkan ke arsip.');
+    }
+
+    /**
+     * Aksi: Cetak surat dari halaman arsip.
+     */
+    /**
+     * Memproses dan men-download file Word (dari Arsip).
+     */
+    public function cetakSurat(AjuanSurat $ajuan)
+    {
+        // 1. Cek Status
+        if ($ajuan->status != 'SELESAI') {
+            return redirect()->route('ajuan-surat.arsip')->with('error', 'Surat ini tidak dapat dicetak.');
         }
+
+        // 2. Load semua data relasi
+        $ajuan->load('warga.kk.dusun', 'jenisSurat', 'pejabatDesa');
 
         $warga = $ajuan->warga;
         $kk = $warga->kk;
         $jenisSurat = $ajuan->jenisSurat;
+        $pejabat = $ajuan->pejabatDesa;
 
-        // 2. Tentukan path ke file template
-        // 'storage/app/public/template_surat/namafile.docx'
+        // 3. Cari file template
         $templatePath = Storage::path('public/template_surat/' . $jenisSurat->template_file);
-
         if (!Storage::exists('public/template_surat/' . $jenisSurat->template_file)) {
-            return redirect()->route('ajuan-surat.index')->with('error', 'File template tidak ditemukan.');
+            return redirect()->route('ajuan-surat.arsip')->with('error', 'File template surat tidak ditemukan. Harap upload ulang di Manajemen Jenis Surat.');
         }
 
-        // 3. Buat nomor surat (contoh sederhana)
-        $nomorSurat = $jenisSurat->kode_surat . '/' . $ajuan->id_ajuan . '/' . date('m/Y');
-
-        // 4. Proses template menggunakan PHPWord
         try {
+            // 4. Proses PHPWord
             $templateProcessor = new TemplateProcessor($templatePath);
 
-            // --- PENGISIAN DATA (Template Variable) ---
-            // Ini harus cocok dengan template .docx Anda: ${nama_lengkap}, ${nik}, dll.
+            // --- Isi Data Warga ---
             $templateProcessor->setValue('nama_lengkap', $warga->nama_lengkap);
             $templateProcessor->setValue('nik', $warga->nik);
             $templateProcessor->setValue('tempat_lahir', $warga->tempat_lahir);
-            $templateProcessor->setValue('tanggal_lahir', \Carbon\Carbon::parse($warga->tanggal_lahir)->isoFormat('D MMMM Y'));
+            $templateProcessor->setValue('tanggal_lahir', Carbon::parse($warga->tanggal_lahir)->isoFormat('D MMMM Y'));
             $templateProcessor->setValue('jenis_kelamin', $warga->jenis_kelamin);
             $templateProcessor->setValue('agama', $warga->agama);
             $templateProcessor->setValue('pekerjaan', $warga->pekerjaan);
+            $templateProcessor->setValue('status_perkawinan', $warga->status_perkawinan);
+            $templateProcessor->setValue('kewarganegaraan', $warga->kewarganegaraan);
 
-            // Mengambil data dari KK
+            // --- Isi Data KK & Alamat ---
             $templateProcessor->setValue('alamat_kk', $kk->alamat_kk);
             $templateProcessor->setValue('rt', $kk->rt);
             $templateProcessor->setValue('rw', $kk->rw);
-
-            // Mengambil data dari Dusun (melalui KK)
             $templateProcessor->setValue('nama_dusun', $kk->dusun->nama_dusun ?? 'N/A');
 
-            // Data Surat
-            $templateProcessor->setValue('nomor_surat', $nomorSurat);
+            // --- Isi Data Ajuan (YANG BARU) ---
+            $templateProcessor->setValue('keperluan', $ajuan->keperluan);
+            $templateProcessor->setValue('nomor_surat', $ajuan->nomor_surat);
+            
+            // --- Isi Data Pejabat (YANG BARU) ---
+            $templateProcessor->setValue('nama_pejabat', $pejabat->nama_pejabat ?? 'N/A');
+            $templateProcessor->setValue('jabatan_pejabat', $pejabat->jabatan ?? 'N/A');
 
-            // 5. Simpan file hasil generate
-            $outputFileName = 'Surat_' . $jenisSurat->kode_surat . '_' . $warga->nik . '_' . time() . '.docx';
-            $outputPath = storage_path('app/public/hasil_surat/' . $outputFileName);
+            // --- INI BAGIAN YANG DIPERBAIKI ---
+            
+            // 5. Buat nama file dan simpan sementara
+            $namaWargaClean = str_replace(' ', '_', $warga->nama_lengkap);
+            $outputFileName = $jenisSurat->kode_surat . '_' . $namaWargaClean . '_' . date('d-m-Y') . '.docx';
+            
+            // Tentukan path sementara di 'storage/app/temp/'
+            $tempPath = storage_path('app/temp/' . $outputFileName);
 
-            // Pastikan folder 'hasil_surat' ada
-            if (!Storage::exists('public/hasil_surat')) {
-                Storage::makeDirectory('public/hasil_surat');
+            // Pastikan folder 'temp' ada
+            if (!Storage::exists('temp')) {
+                Storage::makeDirectory('temp');
             }
+            
+            // Simpan file yang sudah diisi ke path sementara
+            $templateProcessor->saveAs($tempPath);
 
-            $templateProcessor->saveAs($outputPath);
-
-            // 6. Update database
-            $ajuan->status = 'SELESAI';
-            $ajuan->nomor_surat_lengkap = $nomorSurat;
-            $ajuan->file_hasil = 'hasil_surat/' . $outputFileName; // Simpan path relatif
-            $ajuan->save();
-
-            // 7. Kembalikan file untuk di-download
-            return response()->download($outputPath)->deleteFileAfterSend(true);
+            // 6. Download file tersebut dan hapus setelah selesai
+            return response()->download($tempPath)->deleteFileAfterSend(true);
+            
+            // --- AKHIR PERBAIKAN ---
 
         } catch (\Exception $e) {
-            // Jika ada error (misal: template tidak ditemukan, variabel salah)
-            return redirect()->route('ajuan-surat.index')->with('error', 'Terjadi kesalahan saat generate surat: ' . $e->getMessage());
+            // Tangkap error jika template ${variabel} tidak cocok
+            return redirect()->route('ajuan-surat.arsip')->with('error', 'Gagal generate surat. Pastikan template Word sesuai. Error: ' . $e->getMessage());
         }
     }
 
     /**
-     * Menolak ajuan surat.
+     * Aksi: Menampilkan halaman detail (dari Arsip).
      */
-    public function tolakAjuan(Request $request, AjuanSurat $ajuan)
+    public function detailSurat(AjuanSurat $ajuan)
     {
-        // Update status dan catatan penolakan
-        $ajuan->status = 'DITOLAK';
-        $ajuan->catatan_penolakan = $request->input('catatan_penolakan');
-        $ajuan->save();
-
-        return redirect()->route('ajuan-surat.index')->with('success', 'Ajuan surat telah ditolak.');
+        $ajuan->load('warga.kk.dusun', 'jenisSurat', 'pejabatDesa');
+        return view('admin.ajuan-surat.detail', compact('ajuan'));
     }
-    }
+}

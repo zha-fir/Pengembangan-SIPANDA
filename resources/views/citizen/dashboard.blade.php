@@ -19,7 +19,7 @@
             <div class="card-body p-4">
                 <h3 class="mb-1">Selamat Datang, {{ $warga->nama_lengkap }}!</h3>
                 <p class="text-muted">Ini adalah Halaman Pelayanan mandiri Anda.</p>
-                <a href="#" class="btn btn-primary mt-2">
+                <a href="{{ route('warga.ajuan.create') }}" class="btn btn-primary mt-2">
                     <i class="fas fa-file-alt me-2"></i>Mulai Buat Ajuan Surat
                 </a>
             </div>
