@@ -12,7 +12,7 @@ return new class extends Migration
             $table->string('username', 50)->unique();
             $table->string('password'); // Nanti akan di-hash
             $table->string('nama_lengkap', 100);
-            $table->enum('role', ['warga', 'admin', 'kades']);
+            $table->enum('role', ['warga', 'admin', 'kades', 'kadus']);
             // Kita tidak tambahkan timestamps() agar sesuai desain SQL awal
         });
     }

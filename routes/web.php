@@ -14,6 +14,11 @@ use App\Http\Controllers\Admin\ImportWargaController;
 // Alias untuk Controller yang namanya sama
 use App\Http\Controllers\Admin\AjuanSuratController as AdminAjuanSuratController;
 use App\Http\Controllers\Citizen\AjuanSuratController as CitizenAjuanSuratController;
+use App\Http\Controllers\Kades\DashboardController as KadesDashboard;
+use App\Http\Controllers\Kades\MonitoringController;
+use App\Http\Controllers\Kades\LaporanController;
+use App\Http\Controllers\Kades\PendudukController;
+use App\Http\Controllers\Kadus\DashboardController as KadusDashboard;
 
 
 // --- BAGIAN 2: RUTE HALAMAN UTAMA & WARGA ---
@@ -36,6 +41,7 @@ Route::prefix('warga')->group(function () {
         Route::post('/ajuan-surat', [CitizenAjuanSuratController::class, 'store'])->name('warga.ajuan.store');
         Route::get('/profil/password', [ProfileController::class, 'editPassword'])->name('warga.password.edit');
         Route::post('/profil/password', [ProfileController::class, 'updatePassword'])->name('warga.password.update');
+        Route::get('/riwayat-ajuan', [CitizenAjuanSuratController::class, 'history'])->name('warga.ajuan.history');
     });
 });
 
@@ -80,4 +86,27 @@ Route::prefix('admin')->group(function () {
         ->name('ajuan-surat.detail');
         
     // (Rute 'ajuan-surat.proses' yang lama sudah saya hapus)
+
+    Route::prefix('kades')->group(function () {
+        Route::get('/dashboard', [KadesDashboard::class, 'index'])->name('kades.dashboard');
+    
+        // Nanti kita tambah rute monitoring di sini
+        Route::get('/monitoring-surat', [MonitoringController::class, 'index'])->name('kades.monitoring.index');
+        Route::get('/monitoring-surat/{id}', [MonitoringController::class, 'show'])->name('kades.monitoring.show');
+   
+    // MENU LAPORAN
+        Route::get('/laporan', [LaporanController::class, 'index'])->name('kades.laporan.index');
+        Route::get('/laporan/penduduk/cetak', [LaporanController::class, 'cetakPenduduk'])->name('kades.laporan.cetak-penduduk');
+        Route::get('/laporan/surat/cetak', [LaporanController::class, 'cetakSurat'])->name('kades.laporan.cetak-surat');
+
+    // MENU DATA PENDUDUK (Read Only)
+        Route::get('/penduduk', [PendudukController::class, 'index'])->name('kades.penduduk.index');
+        Route::get('/penduduk/{id}', [PendudukController::class, 'show'])->name('kades.penduduk.show');
+    });
+
+    Route::prefix('kadus')->middleware(['auth', 'role:kadus'])->group(function () {
+        Route::get('/dashboard', [KadusDashboard::class, 'index'])->name('kadus.dashboard');
+        Route::get('/warga', [KadusDashboard::class, 'warga'])->name('kadus.warga');
+        Route::get('/surat', [KadusDashboard::class, 'surat'])->name('kadus.surat');
+    });
 });

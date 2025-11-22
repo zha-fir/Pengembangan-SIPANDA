@@ -54,11 +54,12 @@
                                 <i class="fas fa-user me-2"></i>{{ Auth::user()->nama_lengkap }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <!-- Tombol Logout -->
+
+                                {{-- Tombol Logout menggunakan Form --}}
                                 <li>
                                     <form action="{{ route('warga.logout') }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">
+                                        <button type="submit" class="dropdown-item text-danger">
                                             <i class="fas fa-sign-out-alt me-2"></i>Logout
                                         </button>
                                     </form>
@@ -83,6 +84,10 @@
                     <a href="{{ route('warga.ajuan.create') }}"
                         class="list-group-item list-group-item-action @if(Request::is('warga/ajuan-surat*')) active @endif">
                         <i class="fas fa-file-alt fa-fw me-2"></i>Buat Ajuan Surat
+                    </a>
+                    <a href="{{ route('warga.ajuan.history') }}"
+                        class="list-group-item list-group-item-action @if(Request::is('warga/riwayat-ajuan*')) active @endif">
+                        <i class="fas fa-history fa-fw me-2"></i>Status Ajuan Surat
                     </a>
                     <a href="{{ route('warga.password.edit') }}"
                         class="list-group-item list-group-item-action @if(Request::is('warga/profil*')) active @endif">

@@ -34,7 +34,13 @@ class User extends Authenticatable
         'nama_lengkap',
         'password',
         'role',
+        'id_dusun',
     ];
+
+    public function dusun()
+    {
+        return $this->belongsTo(Dusun::class, 'id_dusun', 'id_dusun');
+    }
 
     /**
      * Kolom yang disembunyikan

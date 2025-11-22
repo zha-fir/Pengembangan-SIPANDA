@@ -80,14 +80,15 @@
             <div class="sidebar-heading">
                 Layanan Surat
             </div>
-            
+
             <li class="nav-item @if(Request::is('admin/jenis-surat*')) active @endif">
                 <a class="nav-link" href="{{ route('jenis-surat.index') }}">
                     <i class="fas fa-fw fa-envelope-open-text"></i>
                     <span>Template Surat</span></a>
             </li>
 
-            <li class="nav-item @if(Request::is('admin/ajuan-surat*') && !Request::is('admin/arsip-surat*')) active @endif">
+            <li
+                class="nav-item @if(Request::is('admin/ajuan-surat*') && !Request::is('admin/arsip-surat*')) active @endif">
                 <a class="nav-link" href="{{ route('ajuan-surat.index') }}">
                     <i class="fas fa-fw fa-inbox"></i>
                     <span>Ajuan Surat Masuk</span>
@@ -123,12 +124,12 @@
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {{-- Tampilkan nama user yang login --}}
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->nama_lengkap ?? 'Administrator' }}</span>
-                                
-                                <img class="img-profile rounded-circle"
-                                    src="{{ asset('img/undraw_profile.svg') }}">
+                                <span
+                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->nama_lengkap ?? 'Administrator' }}</span>
+
+                                <img class="img-profile rounded-circle" src="{{ asset('img/undraw_profile.svg') }}">
                             </a>
-                            
+
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="#">
@@ -154,7 +155,7 @@
                     @yield('content')
 
                 </div>
-                </div>
+            </div>
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
@@ -162,8 +163,8 @@
                     </div>
                 </div>
             </footer>
-            </div>
         </div>
+    </div>
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
@@ -178,29 +179,30 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Pilih "Logout" di bawah jika Anda siap untuk mengakhiri sesi Anda saat ini.</div>
+                <div class="modal-body">Pilih "Logout" di bawah jika Anda siap untuk mengakhiri sesi Anda saat ini.
+                </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-                    
-                    {{-- Ini adalah form yang terhubung ke route 'warga.logout' --}}
+
+                    {{-- FORM LOGOUT (Wajib pakai POST dan @csrf) --}}
                     <form action="{{ route('warga.logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-primary">Logout</button>
                     </form>
-                  </div>
+                </div>
             </div>
         </div>
     </div>
 
- {{-- HAPUS SEMUA SKRIP GANDA YANG ANDA MILIKI SEBELUMNYA --}}
-    
+    {{-- HAPUS SEMUA SKRIP GANDA YANG ANDA MILIKI SEBELUMNYA --}}
+
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
-    
+
     {{-- @stack('scripts') harus di paling akhir --}}
     @stack('scripts')
 </body>

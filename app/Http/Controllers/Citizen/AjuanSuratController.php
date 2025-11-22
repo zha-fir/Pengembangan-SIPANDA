@@ -83,4 +83,20 @@ class AjuanSuratController extends Controller
 
         return Redirect::route('warga.dashboard')->with('success', 'Ajuan surat Anda telah berhasil terkirim.');
     }
+
+    public function history()
+{
+    // Ambil data warga yang login
+    $warga = Auth::user()->warga;
+
+    // Ambil SEMUA riwayat tanpa batas
+    $riwayatAjuan = AjuanSurat::with('jenisSurat')
+                              ->where('id_warga', $warga->id_warga)
+                              ->orderBy('tanggal_ajuan', 'desc')
+                              ->get(); // Bisa diganti ->paginate(10) jika ingin halaman 1,2,3
+
+    return view('citizen.ajuan.history', [
+        'riwayatAjuan' => $riwayatAjuan
+    ]);
+}
 }
