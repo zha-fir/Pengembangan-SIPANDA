@@ -101,11 +101,22 @@
                     <span>Arsip Surat</span></a>
             </li>
 
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Pengaturan</div>
+
+            <li class="nav-item @if(Request::is('admin/users*')) active @endif">
+                <a class="nav-link" href="{{ route('users.index') }}">
+                    <i class="fas fa-fw fa-user-cog"></i>
+                    <span>Manajemen Akun</span></a>
+            </li>
+
             <hr class="sidebar-divider d-none d-md-block">
 
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
+
 
         </ul>
         <div id="content-wrapper" class="d-flex flex-column">
@@ -202,6 +213,25 @@
     <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Fungsi Toggle Password Universal
+            $(document).on('click', '.btn-toggle-password', function () {
+                // Cari input yang satu grup dengan tombol ini
+                let input = $(this).closest('.input-group').find('input');
+                let icon = $(this).find('i');
+
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+        });
+    </script>
 
     {{-- @stack('scripts') harus di paling akhir --}}
     @stack('scripts')

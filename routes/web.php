@@ -19,6 +19,7 @@ use App\Http\Controllers\Kades\MonitoringController;
 use App\Http\Controllers\Kades\LaporanController;
 use App\Http\Controllers\Kades\PendudukController;
 use App\Http\Controllers\Kadus\DashboardController as KadusDashboard;
+use App\Http\Controllers\Admin\UserController;
 
 
 // --- BAGIAN 2: RUTE HALAMAN UTAMA & WARGA ---
@@ -59,6 +60,7 @@ Route::prefix('admin')->group(function () {
     Route::resource('warga', WargaController::class);
     Route::resource('jenis-surat', JenisSuratController::class);
     Route::resource('pejabat-desa', PejabatDesaController::class);
+    Route::resource('users', UserController::class);
 
     // Rute Spesial (Import, Anggota KK)
     Route::get('kk/{kk}/members', [KKController::class, 'showMembers'])->name('kk.members');

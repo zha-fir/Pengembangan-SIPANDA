@@ -9,7 +9,6 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
 
-                    {{-- Tampilkan Error Validasi --}}
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul class="mb-0">
@@ -23,24 +22,42 @@
                     <form action="{{ route('warga.password.update') }}" method="POST">
                         @csrf
 
+                        {{-- 1. Password Lama --}}
                         <div class="mb-4">
                             <label for="current_password" class="form-label">Password Lama</label>
-                            <input type="password" class="form-control" id="current_password" name="current_password"
-                                required>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="current_password" name="current_password"
+                                    required>
+                                <button class="btn btn-outline-secondary btn-toggle-password" type="button">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <hr>
 
+                        {{-- 2. Password Baru --}}
                         <div class="mb-3">
                             <label for="new_password" class="form-label">Password Baru</label>
-                            <input type="password" class="form-control" id="new_password" name="new_password" required
-                                placeholder="Minimal 6 karakter">
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="new_password" name="new_password" required
+                                    placeholder="Minimal 6 karakter">
+                                <button class="btn btn-outline-secondary btn-toggle-password" type="button">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
+                        {{-- 3. Konfirmasi Password Baru --}}
                         <div class="mb-4">
                             <label for="new_password_confirmation" class="form-label">Konfirmasi Password Baru</label>
-                            <input type="password" class="form-control" id="new_password_confirmation"
-                                name="new_password_confirmation" required placeholder="Ulangi password baru">
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="new_password_confirmation"
+                                    name="new_password_confirmation" required placeholder="Ulangi password baru">
+                                <button class="btn btn-outline-secondary btn-toggle-password" type="button">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-between">
