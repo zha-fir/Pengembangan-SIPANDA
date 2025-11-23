@@ -28,10 +28,10 @@
                 <input type="text" class="form-control" id="no_kk" name="no_kk" value="{{ old('no_kk', $kk->no_kk) }}">
             </div>
 
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label for="nama_kepala_keluarga">Nama Kepala Keluarga</label>
                 <input type="text" class="form-control" id="nama_kepala_keluarga" name="nama_kepala_keluarga" value="{{ old('nama_kepala_keluarga', $kk->nama_kepala_keluarga) }}">
-            </div>
+            </div> --}}
 
             <div class="row">
                 <div class="col-md-8">

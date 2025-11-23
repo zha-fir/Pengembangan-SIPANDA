@@ -27,4 +27,10 @@ class KK extends Model
     {
         return $this->hasMany(Warga::class, 'id_kk', 'id_kk');
     }
+
+    public function kepalaKeluarga()
+    {
+        return $this->hasOne(Warga::class, 'id_kk', 'id_kk')
+                    ->where('status_dalam_keluarga', 'KEPALA KELUARGA');
+    }
 }

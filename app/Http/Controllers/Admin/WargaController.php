@@ -33,7 +33,7 @@ class WargaController extends Controller
     public function create()
     {
         // Ambil semua data KK untuk dropdown
-        $kkList = KK::all(); 
+        $kkList = KK::with('kepalaKeluarga')->get();
 
         return view('admin.warga.create', [
             'kkList' => $kkList
@@ -55,12 +55,27 @@ public function store(Request $request)
         'id_kk' => 'required|integer|exists:tabel_kk,id_kk',
         'tempat_lahir' => 'nullable|string|max:100',
         'tanggal_lahir' => 'nullable|date',
+        'status_dalam_keluarga' => 'required|in:KEPALA KELUARGA,ISTRI,ANAK,FAMILI LAIN',
         // ... (validasi lainnya bisa Anda tambahkan kembali jika perlu)
     ], [
         'nik.required' => 'NIK wajib diisi.',
         'nik.unique' => 'NIK ini sudah terdaftar. Warga ini mungkin sudah diinput.',
         'id_kk.required' => 'Kartu Keluarga wajib dipilih.',
     ]);
+
+    if ($request->status_dalam_keluarga == 'KEPALA KELUARGA') {
+            // Cek apakah di KK ini SUDAH ADA kepala keluarga?
+            $adaKepala = Warga::where('id_kk', $request->id_kk)
+                              ->where('status_dalam_keluarga', 'KEPALA KELUARGA')
+                              ->exists(); // Mengembalikan true/false
+            
+            if ($adaKepala) {
+                // Jika sudah ada, kembalikan error ke form
+                return back()
+                    ->withInput() // Kembalikan inputan agar admin tidak ngetik ulang
+                    ->withErrors(['status_dalam_keluarga' => 'GAGAL: Kartu Keluarga ini sudah memiliki Kepala Keluarga. Silakan pilih status lain atau edit Kepala Keluarga yang lama.']);
+            }
+        }
 
     // 2. OTOMATIS Buat Akun Login (User)
     // Kita gunakan updateOrCreate untuk keamanan,
@@ -87,6 +102,7 @@ public function store(Request $request)
     $warga->status_perkawinan = $request->status_perkawinan;
     $warga->pekerjaan = $request->pekerjaan;
     $warga->kewarganegaraan = $request->kewarganegaraan ?? 'WNI';
+    $warga->status_dalam_keluarga = $request->status_dalam_keluarga;
     $warga->save();
 
     return Redirect::route('warga.index')->with('success', 'Data warga berhasil ditambahkan DAN akun login telah dibuat.');
@@ -98,7 +114,7 @@ public function store(Request $request)
     public function edit(Warga $warga)
     {
         // Kita perlu data KK untuk dropdown
-        $kkList = KK::all();
+        $kkList = KK::with('kepalaKeluarga')->get();
 
         return view('admin.warga.edit', [
             'warga' => $warga, // Data warga yang mau diedit
@@ -121,11 +137,27 @@ public function store(Request $request)
             ],
             'nama_lengkap' => 'required|string|max:100',
             'id_kk' => 'required|integer|exists:tabel_kk,id_kk',
+            'status_dalam_keluarga' => 'required|in:KEPALA KELUARGA,ISTRI,ANAK,FAMILI LAIN',
             // ... (validasi data warga lainnya) ...
 
             // Validasi untuk reset password (HANYA JIKA dicentang)
             'password' => 'required_if:reset_password,on|nullable|string|min:6',
         ]);
+
+        if ($request->status_dalam_keluarga == 'KEPALA KELUARGA') {
+            // Cek apakah ada orang LAIN (selain warga yang sedang diedit ini)
+            // yang sudah jadi Kepala Keluarga di KK yang sama
+            $adaKepalaLain = Warga::where('id_kk', $request->id_kk)
+                                  ->where('status_dalam_keluarga', 'KEPALA KELUARGA')
+                                  ->where('id_warga', '!=', $warga->id_warga) // PENTING: Kecualikan diri sendiri
+                                  ->exists();
+            
+            if ($adaKepalaLain) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['status_dalam_keluarga' => 'GAGAL: Kartu Keluarga ini sudah memiliki Kepala Keluarga lain.']);
+            }
+        }
 
         // 2. Logika Update Akun (Reset Password)
         // Cek jika warga punya akun DAN admin mencentang reset
@@ -143,6 +175,7 @@ public function store(Request $request)
         $warga->jenis_kelamin = $request->jenis_kelamin;
         $warga->agama = $request->agama;
         $warga->status_perkawinan = $request->status_perkawinan;
+        $warga->status_dalam_keluarga = $request->status_dalam_keluarga;
         $warga->pekerjaan = $request->pekerjaan;
         $warga->kewarganegaraan = $request->kewarganegaraan ?? 'WNI';
         $warga->save();
@@ -163,5 +196,15 @@ public function store(Request $request)
         } catch (\Exception $e) {
             return Redirect::route('warga.index')->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }
+    }
+
+    public function show(Warga $warga)
+    {
+        // Kita load relasi KK dan Dusun agar bisa menampilkan alamat lengkap
+        $warga->load('kk.dusun');
+
+        return view('admin.warga.show', [
+            'warga' => $warga
+        ]);
     }
 }

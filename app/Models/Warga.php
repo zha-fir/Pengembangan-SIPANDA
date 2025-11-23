@@ -21,6 +21,7 @@ class Warga extends Model
         'nik',
         'nama_lengkap',
         'id_kk',
+        'status_dalam_keluarga',
         'id_user',
         'tempat_lahir',
         'tanggal_lahir',

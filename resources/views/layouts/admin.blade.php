@@ -25,11 +25,12 @@
 
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin/dashboard">
-                <div class="sidebar-brand-icon">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center"
+                href="{{ route('admin.dashboard') }}">
+                <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-university"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">SIPANDA</div>
+                <div class="sidebar-brand-text mx-3">SIM Administrasi</div>
             </a>
 
             <hr class="sidebar-divider my-0">
@@ -43,67 +44,80 @@
             <hr class="sidebar-divider">
 
             <div class="sidebar-heading">
-                Manajemen Data
+                Menu Utama
             </div>
 
-            <li class="nav-item @if(Request::is('admin/dusun*')) active @endif">
-                <a class="nav-link" href="{{ route('dusun.index') }}">
-                    <i class="fas fa-fw fa-map-marker-alt"></i>
-                    <span>Manajemen Dusun</span></a>
-            </li>
-
-            <li class="nav-item @if(Request::is('admin/kk*')) active @endif">
-                <a class="nav-link" href="{{ route('kk.index') }}">
-                    <i class="fas fa-fw fa-users"></i>
-                    <span>Manajemen KK</span></a>
-            </li>
-
-            <li class="nav-item @if(Request::is('admin/warga*')) active @endif">
-                <a class="nav-link" href="{{ route('warga.index') }}">
-                    <i class="fas fa-fw fa-address-book"></i>
-                    <span>Data Penduduk</span></a>
-            </li>
-
-            <li class="nav-item @if(Request::is('admin/pejabat-desa*')) active @endif">
-                <a class="nav-link" href="{{ route('pejabat-desa.index') }}">
-                    <i class="fas fa-fw fa-user-tie"></i>
-                    <span>Pejabat Desa</span>
+            @php
+                $isDataActive = Request::is('admin/dusun*') || Request::is('admin/kk*') || Request::is('admin/warga*') || Request::is('admin/pejabat-desa*');
+            @endphp
+            <li class="nav-item {{ $isDataActive ? 'active' : '' }}">
+                <a class="nav-link {{ $isDataActive ? '' : 'collapsed' }}" href="#" data-toggle="collapse"
+                    data-target="#collapseData" aria-expanded="{{ $isDataActive ? 'true' : 'false' }}"
+                    aria-controls="collapseData">
+                    <i class="fas fa-fw fa-database"></i>
+                    <span>Manajemen Data</span>
                 </a>
+                <div id="collapseData" class="collapse {{ $isDataActive ? 'show' : '' }}" aria-labelledby="headingTwo"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Data Master:</h6>
+
+                        <a class="collapse-item {{ Request::is('admin/dusun*') ? 'active' : '' }}"
+                            href="{{ route('dusun.index') }}">
+                            Data Dusun
+                        </a>
+                        <a class="collapse-item {{ Request::is('admin/kk*') ? 'active' : '' }}"
+                            href="{{ route('kk.index') }}">
+                            Data Kartu Keluarga
+                        </a>
+                        <a class="collapse-item {{ Request::is('admin/warga*') ? 'active' : '' }}"
+                            href="{{ route('warga.index') }}">
+                            Data Penduduk
+                        </a>
+                        <a class="collapse-item {{ Request::is('admin/pejabat-desa*') ? 'active' : '' }}"
+                            href="{{ route('pejabat-desa.index') }}">
+                            Pejabat Desa
+                        </a>
+                    </div>
+                </div>
             </li>
-            <!-- <li class="nav-item @if(Request::is('admin/import-warga*')) active @endif">
-            <a class="nav-link" href="{{ route('admin.warga.import.form') }}">
-                <i class="fas fa-fw fa-file-import"></i>
-                <span>Import Warga</span></a>
-            </li> -->
 
-            <hr class="sidebar-divider">
-            <div class="sidebar-heading">
-                Layanan Surat
-            </div>
-
-            <li class="nav-item @if(Request::is('admin/jenis-surat*')) active @endif">
-                <a class="nav-link" href="{{ route('jenis-surat.index') }}">
+            @php
+                $isSuratActive = Request::is('admin/jenis-surat*') || Request::is('admin/ajuan-surat*') || Request::is('admin/arsip-surat*');
+            @endphp
+            <li class="nav-item {{ $isSuratActive ? 'active' : '' }}">
+                <a class="nav-link {{ $isSuratActive ? '' : 'collapsed' }}" href="#" data-toggle="collapse"
+                    data-target="#collapseSurat" aria-expanded="{{ $isSuratActive ? 'true' : 'false' }}"
+                    aria-controls="collapseSurat">
                     <i class="fas fa-fw fa-envelope-open-text"></i>
-                    <span>Template Surat</span></a>
-            </li>
-
-            <li
-                class="nav-item @if(Request::is('admin/ajuan-surat*') && !Request::is('admin/arsip-surat*')) active @endif">
-                <a class="nav-link" href="{{ route('ajuan-surat.index') }}">
-                    <i class="fas fa-fw fa-inbox"></i>
-                    <span>Ajuan Surat Masuk</span>
+                    <span>Layanan Surat</span>
                 </a>
-            </li>
+                <div id="collapseSurat" class="collapse {{ $isSuratActive ? 'show' : '' }}"
+                    aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Persuratan:</h6>
 
-            <li class="nav-item @if(Request::is('admin/arsip-surat*')) active @endif">
-                <a class="nav-link" href="{{ route('ajuan-surat.arsip') }}">
-                    <i class="fas fa-fw fa-archive"></i>
-                    <span>Arsip Surat</span></a>
+                        <a class="collapse-item {{ Request::is('admin/jenis-surat*') ? 'active' : '' }}"
+                            href="{{ route('jenis-surat.index') }}">
+                            Template Surat
+                        </a>
+                        <a class="collapse-item {{ Request::is('admin/ajuan-surat*') && !Request::is('admin/arsip-surat*') ? 'active' : '' }}"
+                            href="{{ route('ajuan-surat.index') }}">
+                            Ajuan Masuk
+                        </a>
+                        <a class="collapse-item {{ Request::is('admin/arsip-surat*') ? 'active' : '' }}"
+                            href="{{ route('ajuan-surat.arsip') }}">
+                            Arsip Surat
+                        </a>
+                    </div>
+                </div>
             </li>
 
             <hr class="sidebar-divider">
 
-            <div class="sidebar-heading">Pengaturan</div>
+            <div class="sidebar-heading">
+                Pengaturan
+            </div>
 
             <li class="nav-item @if(Request::is('admin/users*')) active @endif">
                 <a class="nav-link" href="{{ route('users.index') }}">
@@ -116,7 +130,6 @@
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
-
 
         </ul>
         <div id="content-wrapper" class="d-flex flex-column min-vh-100">

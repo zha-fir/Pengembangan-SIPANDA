@@ -38,7 +38,7 @@ class PendudukController extends Controller
     public function show($id)
     {
         // Cari warga berdasarkan ID, jika tidak ada -> 404 Not Found
-        $warga = Warga::with('kk.dusun')->findOrFail($id);
+        $warga = Warga::with(['kk.dusun', 'kk.kepalaKeluarga'])->findOrFail($id);
 
         return view('kades.penduduk.show', compact('warga'));
     }

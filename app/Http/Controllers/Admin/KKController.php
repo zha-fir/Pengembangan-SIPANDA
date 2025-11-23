@@ -19,11 +19,8 @@ class KKController extends Controller
         // Ini adalah "Eager Loading" di Laravel.
         // Ini mengambil data KK sekaligus data Dusun yang terelasi
         // agar lebih efisien dan tidak error N+1 query.
-        $kkList = KK::with('dusun')->get();
-
-        return view('admin.kk.index', [
-            'kkList' => $kkList
-        ]);
+        $kkList = KK::with(['dusun', 'kepalaKeluarga'])->get();
+        return view('admin.kk.index', compact('kkList'));
     }
 
     /**
@@ -48,7 +45,7 @@ class KKController extends Controller
         // 1. Validasi (termasuk validasi 'id_dusun')
         $request->validate([
             'no_kk' => 'required|string|size:16|unique:tabel_kk',
-            'nama_kepala_keluarga' => 'required|string|max:100',
+            // 'nama_kepala_keluarga' => 'required|string|max:100',
             'id_dusun' => 'required|integer|exists:tabel_dusun,id_dusun', // Pastikan id_dusun ada di tabel_dusun
             'rt' => 'nullable|string|max:3',
             'rw' => 'nullable|string|max:3',
@@ -62,7 +59,7 @@ class KKController extends Controller
         // 2. Simpan data
         $kk = new KK();
         $kk->no_kk = $request->no_kk;
-        $kk->nama_kepala_keluarga = $request->nama_kepala_keluarga;
+        // $kk->nama_kepala_keluarga = $request->nama_kepala_keluarga;
         $kk->id_dusun = $request->id_dusun;
         $kk->rt = $request->rt;
         $kk->rw = $request->rw;
@@ -97,7 +94,7 @@ class KKController extends Controller
                 'size:16',
                 Rule::unique('tabel_kk')->ignore($kk->id_kk, 'id_kk') // Unik, kecuali untuk dirinya sendiri
             ],
-            'nama_kepala_keluarga' => 'required|string|max:100',
+            // 'nama_kepala_keluarga' => 'required|string|max:100',
             'id_dusun' => 'required|integer|exists:tabel_dusun,id_dusun',
             'rt' => 'nullable|string|max:3',
             'rw' => 'nullable|string|max:3',
@@ -106,7 +103,7 @@ class KKController extends Controller
 
         // 2. Simpan perubahan
         $kk->no_kk = $request->no_kk;
-        $kk->nama_kepala_keluarga = $request->nama_kepala_keluarga;
+        // $kk->nama_kepala_keluarga = $request->nama_kepala_keluarga;
         $kk->id_dusun = $request->id_dusun;
         $kk->rt = $request->rt;
         $kk->rw = $request->rw;
@@ -137,7 +134,7 @@ class KKController extends Controller
     {
         // Load relasi 'warga' (anggota keluarga)
         // Kita juga load relasi 'dusun' dari KK untuk ditampilkan
-        $kk->load('warga', 'dusun');
+        $kk->load('warga', 'dusun', 'kepalaKeluarga');
 
         // Kirim data KK (yang sudah berisi data warga) ke view
         return view('admin.kk.members', [
