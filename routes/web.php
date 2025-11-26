@@ -32,7 +32,7 @@ Route::get('/', function () {
 
 // Halaman Login & Proses Login
 // Kita gunakan middleware 'guest' agar yang SUDAH login tidak bisa masuk sini lagi
-Route::middleware('guest')->prefix('warga')->group(function () {
+Route::prefix('warga')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('warga.login.form');
     Route::post('/login', [AuthController::class, 'login'])->name('warga.login.submit');
 });

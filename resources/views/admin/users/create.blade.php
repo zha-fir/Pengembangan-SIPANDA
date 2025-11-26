@@ -33,21 +33,8 @@
                         <select name="role" id="role" class="form-control" required>
                             <option value="">-- Pilih Role --</option>
                             <option value="admin">Administrator / Operator</option>
-                            <option value="kades">Kepala Desa</option>
-                            <option value="kadus">Kepala Dusun</option>
                         </select>
                     </div>
-                </div>
-
-                {{-- Dropdown Dusun (Hanya muncul jika Kadus) --}}
-                <div class="form-group d-none" id="area_dusun">
-                    <label class="font-weight-bold text-success">Pilih Wilayah Dusun (Wajib untuk Kadus)</label>
-                    <select name="id_dusun" class="form-control">
-                        <option value="">-- Pilih Dusun --</option>
-                        @foreach($dusunList as $dusun)
-                            <option value="{{ $dusun->id_dusun }}">{{ $dusun->nama_dusun }}</option>
-                        @endforeach
-                    </select>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Simpan</button>

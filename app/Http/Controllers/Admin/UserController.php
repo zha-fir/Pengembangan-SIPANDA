@@ -39,7 +39,7 @@ class UserController extends Controller
             'nama_lengkap' => 'required|string|max:100',
             'username' => 'required|string|max:50|unique:tabel_users',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,kades,kadus',
+            'role' => 'required|in:admin',
             // id_dusun wajib diisi HANYA JIKA role = kadus
             'id_dusun' => 'nullable|required_if:role,kadus|exists:tabel_dusun,id_dusun',
         ], [
