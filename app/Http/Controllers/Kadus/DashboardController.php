@@ -67,16 +67,24 @@ class DashboardController extends Controller
     {
         $idDusun = Auth::user()->id_dusun;
 
+        // 1. Filter Warga yang hanya ada di Dusun ini
         $query = Warga::with('kk')
                       ->whereHas('kk', function($q) use ($idDusun) {
                           $q->where('id_dusun', $idDusun);
                       });
 
+        // 2. Logika Pencarian (Nama ATAU NIK)
         if ($request->filled('search')) {
-            $query->where('nama_lengkap', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            
+            // Kita bungkus dalam 'where function' agar logika OR tidak merusak filter dusun
+            $query->where(function($q) use ($search) {
+                $q->where('nama_lengkap', 'like', '%' . $search . '%')
+                  ->orWhere('nik', 'like', '%' . $search . '%');
+            });
         }
 
-        $wargaList = $query->paginate(10);
+        $wargaList = $query->paginate(10)->withQueryString();
 
         return view('kadus.warga.index', compact('wargaList'));
     }

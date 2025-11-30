@@ -75,27 +75,35 @@
                     </div>
                 </div>
 
-                {{-- FORM KHUSUS SKTM --}}
-                {{-- Pastikan ID ini ada --}}
+                {{-- 2. FORM KHUSUS SKTM --}}
                 <div class="card bg-light border-0 mb-3 d-none extra-form" id="form_sktm">
                     <div class="card-body">
                         <h6 class="text-primary fw-bold"><i class="fas fa-wallet me-1"></i> Detail Ekonomi</h6>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="mb-2">
-                                    <label class="form-label small fw-bold">Penghasilan Rata-rata</label>
-                                    {{-- Simpan sebagai 'penghasilan' --}}
+                                    <label class="form-label small fw-bold">Penghasilan Rata-rata (Per Bulan)</label>
                                     <input type="text" class="form-control input-extra" name="penghasilan"
                                         placeholder="Contoh: Rp 500.000">
                                 </div>
                             </div>
+
+                            {{-- KITA HAPUS INPUT INI KARENA SUDAH OTOMATIS --}}
+                            {{--
                             <div class="col-md-6">
                                 <div class="mb-2">
-                                    <label class="form-label small fw-bold">Jumlah Tanggungan</label>
-                                    {{-- Simpan sebagai 'jumlah_tanggungan' --}}
-                                    <input type="number" class="form-control input-extra" name="jumlah_tanggungan"
-                                        placeholder="Contoh: 3">
+                                    <label>Jumlah Tanggungan Keluarga</label>
+                                    <input type="number" name="jumlah_tanggungan">
                                 </div>
+                            </div>
+                            --}}
+
+                            {{-- GANTI DENGAN INFO --}}
+                            <div class="col-12">
+                                <small class="text-muted fst-italic">
+                                    * Jumlah tanggungan akan dihitung otomatis berdasarkan data Kartu Keluarga Anda di
+                                    sistem.
+                                </small>
                             </div>
                         </div>
                     </div>

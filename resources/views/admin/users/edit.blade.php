@@ -20,15 +20,20 @@
 
                 <div class="row">
                     <div class="col-md-6 form-group">
-                        <label>Password</label>
+                        <label>Password Baru</label>
                         <div class="input-group">
-                            <input type="password" name="password" class="form-control" required>
-                            <div class="input-group-append"> {{-- SBAdmin2 menggunakan input-group-append --}}
+                            <input type="password" name="password" class="form-control"
+                                placeholder="Isi hanya jika ingin mengganti password">
+                            <div class="input-group-append">
                                 <button class="btn btn-outline-secondary btn-toggle-password" type="button">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
+                        {{-- TAMBAHKAN INI --}}
+                        <small class="text-danger mt-1">
+                            * Kosongkan jika tidak ingin mengubah password user ini.
+                        </small>
                     </div>
                     <div class="col-md-6 form-group">
                         <label>Role</label>

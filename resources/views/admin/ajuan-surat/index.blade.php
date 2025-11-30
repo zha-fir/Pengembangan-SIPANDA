@@ -52,7 +52,7 @@
                                         data-nama="{{ $ajuan->warga->nama_lengkap ?? '' }}"
                                         data-nik="{{ $ajuan->warga->nik ?? '' }}"
                                         data-jenis-surat="{{ $ajuan->jenisSurat->nama_surat ?? '' }}"
-                                        data-keperluan="{{ $ajuan->keperluan }}"> {{-- PASTIKAN BARIS INI ADA --}}
+                                        data-keperluan="{{ $ajuan->keperluan }}" data-tambahan="{{ $ajuan->data_tambahan }}">
                                         <i class="fas fa-check"></i> Konfirmasi
                                     </button>
 
@@ -91,6 +91,15 @@
                             <li><strong>Jenis Surat:</strong> <span id="modalJenisSurat"></span></li>
                             <li><strong>Keperluan:</strong> <span id="modalKeperluan"></span></li>
                         </ul>
+
+                        {{-- AREA BARU: DATA TAMBAHAN (Default disembunyikan) --}}
+                        <div id="areaDataTambahan" class="alert alert-warning d-none">
+                            <h6 class="font-weight-bold"><i class="fas fa-info-circle"></i> Data Input Warga:</h6>
+                            <ul id="listDataTambahan" class="mb-0 pl-3">
+                                {{-- List akan diisi otomatis oleh JavaScript --}}
+                            </ul>
+                        </div>
+
                         <hr>
                         <p>Silakan isi detail surat resmi di bawah ini:</p>
                         <div class="form-group">
@@ -165,6 +174,7 @@
     <script>
         $(document).ready(function () {
             // Script untuk Modal Konfirmasi
+            // Script untuk Modal Konfirmasi
             $('#konfirmasiModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
                 var ajuanId = button.data('id');
@@ -172,6 +182,9 @@
                 var nik = button.data('nik');
                 var keperluan = button.data('keperluan');
                 var jenisSurat = button.data('jenis-surat');
+
+                // AMBIL DATA TAMBAHAN (JSON)
+                var dataTambahan = button.data('tambahan');
 
                 var modal = $(this);
                 var actionUrl = "{{ url('admin/ajuan-surat') }}/" + ajuanId + "/konfirmasi";
@@ -181,6 +194,30 @@
                 modal.find('#modalNik').text(nik);
                 modal.find('#modalKeperluan').text(keperluan);
                 modal.find('#modalJenisSurat').text(jenisSurat);
+
+                // --- LOGIKA MENAMPILKAN DATA TAMBAHAN ---
+                var listArea = modal.find('#listDataTambahan');
+                var container = modal.find('#areaDataTambahan');
+
+                // Kosongkan list lama
+                listArea.empty();
+
+                if (dataTambahan) {
+                    // Jika ada data tambahan, Munculkan kotaknya
+                    container.removeClass('d-none');
+
+                    // Loop setiap data (key: value)
+                    $.each(dataTambahan, function (key, value) {
+                        // Rapikan nama Key (misal: "bidang_usaha" jadi "Bidang Usaha")
+                        var label = key.replace(/_/g, ' ').replace(/\b\w/g, function (l) { return l.toUpperCase() });
+
+                        // Masukkan ke list
+                        listArea.append('<li><strong>' + label + ':</strong> ' + value + '</li>');
+                    });
+                } else {
+                    // Jika tidak ada data tambahan, sembunyikan kotaknya
+                    container.addClass('d-none');
+                }
             });
 
             // Script untuk Modal Tolak
