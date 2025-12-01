@@ -1,12 +1,14 @@
 @extends('layouts.kadus')
 
-@section('title', 'Data Penduduk Saya')
+@section('title', 'Daftar Penduduk ' . (Auth::user()->dusun->nama_dusun ?? ''))
 
 @section('content')
 
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Penduduk</h6>
+            <h6 class="m-0 font-weight-bold text-primary">
+                Penduduk {{ Auth::user()->dusun->nama_dusun ?? 'Wilayah Ini' }}
+            </h6>
 
             <form action="{{ route('kadus.warga') }}" method="GET" class="form-inline">
                 <div class="input-group">
