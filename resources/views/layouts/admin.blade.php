@@ -83,8 +83,8 @@
 
             <a class="sidebar-brand d-flex align-items-center justify-content-center"
                 href="{{ route('admin.dashboard') }}">
-                <div class="sidebar-brand-icon">
-                    <i class="fas fa-university"></i>
+    <div class="sidebar-brand-icon">
+                    <img src="{{ asset('img/Logo_Kabupaten.png') }}" alt="Logo" style="width: 35px; height: auto;">
                 </div>
                 <div class="sidebar-brand-text mx-3">SIPANDA</div>
             </a>

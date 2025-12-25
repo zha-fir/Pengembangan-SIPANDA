@@ -79,6 +79,7 @@ class AjuanSuratController extends Controller
         // Jika kosong, biarkan null
         $ajuan->data_tambahan = count($dataTambahan) > 0 ? json_encode($dataTambahan) : null;
         
+        $ajuan->tanggal_ajuan = now();
         $ajuan->status = 'BARU';
         $ajuan->save();
 

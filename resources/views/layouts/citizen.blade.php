@@ -147,7 +147,7 @@
                 </button>
 
                 <a class="navbar-brand" href="{{ route('warga.dashboard') }}">
-                    <i class="fas fa-landmark me-2"></i>SIPANDA
+                    <img src="{{ asset('img/Logo_Kabupaten.png') }}" alt="Logo" style="width: 35px; height: auto;"> SIPANDA
                 </a>
             </div>
 

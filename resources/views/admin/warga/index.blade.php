@@ -52,17 +52,17 @@
 
             </div>
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
 
                     {{-- HEADER HARUS DI LUAR LOOP --}}
-                    <thead>
+                    <thead class="thead-light">
                         <tr>
                             <th>NIK</th>
                             <th>Nama Lengkap</th>
                             <th>No. KK</th>
-                            <th>Status Hubungan</th>
-                            <th>Akun Login</th>
-                            <th>Aksi</th>
+                            <th class="text-center">Status Hubungan</th>
+                            <th class="text-center">Akun Login</th>
+                            <th class="text-center" width="15%">Aksi</th>
                         </tr>
                     </thead>
 
@@ -70,13 +70,24 @@
                     <tbody>
                         @forelse ($wargaList as $warga)
                             <tr>
-                                <td>{{ $warga->nik }}</td>
-                                <td>{{ $warga->nama_lengkap }}</td>
-                                <td>
-                                    {{ $warga->kk->no_kk ?? 'Tidak ada KK' }}
+                                <td class="align-middle font-weight-bold">{{ $warga->nik }}</td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-2">
+                                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span class="font-weight-bold text-dark">{{ $warga->nama_lengkap }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    {{ $warga->kk->no_kk ?? '-' }}
                                 </td>
                                 {{-- DATA STATUS HUBUNGAN (BARU) --}}
-                                <td>
+                                <td class="align-middle text-center">
                                     @if($warga->status_dalam_keluarga == 'KEPALA KELUARGA')
                                         <span class="badge badge-primary" style="font-size: 0.9em;">KEPALA KELUARGA</span>
                                     @elseif($warga->status_dalam_keluarga == 'ISTRI')
@@ -87,38 +98,42 @@
                                         <span class="badge badge-light text-dark border">{{ $warga->status_dalam_keluarga }}</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="align-middle text-center">
                                     @if($warga->user)
-                                        <span class="badge badge-success">Ada</span>
+                                        <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i>Ada</span>
                                     @else
-                                        <span class="badge badge-secondary">Belum Ada</span>
+                                        <span class="badge badge-secondary px-2 py-1">Belum Ada</span>
                                     @endif
                                 </td>
-                                <td>
-                                    {{-- TOMBOL DETAIL (BARU) --}}
-                                    <a href="{{ route('warga.show', $warga->id_warga) }}" class="btn btn-sm btn-info"
-                                        title="Lihat Detail">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    {{-- Tombol Edit --}}
-                                    <a href="{{ route('warga.edit', $warga->id_warga) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
+                                <td class="align-middle text-center">
+                                    <div class="d-flex justify-content-center">
+                                        {{-- TOMBOL DETAIL (BARU) --}}
+                                        <a href="{{ route('warga.show', $warga->id_warga) }}" class="btn btn-info btn-circle btn-sm mr-1"
+                                            title="Lihat Detail">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {{-- Tombol Edit --}}
+                                        <a href="{{ route('warga.edit', $warga->id_warga) }}" class="btn btn-warning btn-circle btn-sm mr-1" title="Edit Data">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
-                                    {{-- Tombol Hapus --}}
-                                    <form action="{{ route('warga.destroy', $warga->id_warga) }}" method="POST" class="d-inline"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus data warga ini? Akun login yang terhubung (jika ada) juga akan dihapus permanen.');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash"></i> Hapus
-                                        </button>
-                                    </form>
+                                        {{-- Tombol Hapus --}}
+                                        <form action="{{ route('warga.destroy', $warga->id_warga) }}" method="POST" class="d-inline"
+                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus data warga ini? Akun login yang terhubung (jika ada) juga akan dihapus permanen.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-circle btn-sm" title="Hapus Data">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">Data masih kosong.</td>
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="text-gray-500">Data Penduduk belum tersedia.</div>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>

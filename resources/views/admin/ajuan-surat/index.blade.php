@@ -25,47 +25,69 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable">
-                    <thead>
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-light">
                         <tr>
                             <th>Tanggal Pengajuan</th>
                             <th>Pemohon (NIK)</th>
                             <th>Jenis Surat</th>
                             <th>Keperluan</th>
-                            <th>Aksi</th>
+                            <th class="text-center" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($ajuanList as $ajuan)
                             <tr>
-                                <td>{{ $ajuan->tanggal_ajuan }}</td>
-                                <td>
-                                    {{ $ajuan->warga->nama_lengkap ?? 'N/A' }}
-                                    <br><small>NIK: {{ $ajuan->warga->nik ?? 'N/A' }}</small>
+                                <td class="align-middle">
+                                    <i class="far fa-calendar-alt text-gray-400 mr-2"></i>
+                                    {{ $ajuan->tanggal_ajuan }}
                                 </td>
-                                <td>{{ $ajuan->jenisSurat->nama_surat ?? 'N/A' }}</td>
-                                <td>{{ $ajuan->keperluan }}</td>
-                                <td>
-                                    {{-- Tombol Pemicu Modal Konfirmasi --}}
-                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal"
-                                        data-target="#konfirmasiModal" data-id="{{ $ajuan->id_ajuan }}"
-                                        data-nama="{{ $ajuan->warga->nama_lengkap ?? '' }}"
-                                        data-nik="{{ $ajuan->warga->nik ?? '' }}"
-                                        data-jenis-surat="{{ $ajuan->jenisSurat->nama_surat ?? '' }}"
-                                        data-keperluan="{{ $ajuan->keperluan }}" data-tambahan="{{ $ajuan->data_tambahan }}">
-                                        <i class="fas fa-check"></i> Konfirmasi
-                                    </button>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="mr-2">
+                                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span class="font-weight-bold text-dark">{{ optional($ajuan->warga)->nama_lengkap ?? 'N/A' }}</span>
+                                            <br>
+                                            <small class="text-muted">NIK: {{ optional($ajuan->warga)->nik ?? 'N/A' }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <span class="font-weight-bold text-primary">{{ optional($ajuan->jenisSurat)->nama_surat ?? 'N/A' }}</span>
+                                </td>
+                                <td class="align-middle">{{ $ajuan->keperluan }}</td>
+                                <td class="align-middle text-center">
+                                    <div class="d-flex justify-content-center">
+                                        {{-- Tombol Pemicu Modal Konfirmasi --}}
+                                        <button type="button" class="btn btn-success btn-circle btn-sm mr-1" data-toggle="modal"
+                                            data-target="#konfirmasiModal" data-id="{{ $ajuan->id_ajuan }}"
+                                            data-nama="{{ optional($ajuan->warga)->nama_lengkap ?? '' }}"
+                                            data-nik="{{ optional($ajuan->warga)->nik ?? '' }}"
+                                            data-jenis-surat="{{ optional($ajuan->jenisSurat)->nama_surat ?? '' }}"
+                                            data-keperluan="{{ $ajuan->keperluan }}" data-tambahan="{{ $ajuan->data_tambahan }}"
+                                            title="Konfirmasi">
+                                            <i class="fas fa-check"></i>
+                                        </button>
 
-                                    {{-- Tombol Pemicu Modal Tolak --}}
-                                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
-                                        data-target="#tolakModal" data-id="{{ $ajuan->id_ajuan }}">
-                                        <i class="fas fa-times"></i> Tolak
-                                    </button>
+                                        {{-- Tombol Pemicu Modal Tolak --}}
+                                        <button type="button" class="btn btn-danger btn-circle btn-sm" data-toggle="modal"
+                                            data-target="#tolakModal" data-id="{{ $ajuan->id_ajuan }}"
+                                            title="Tolak">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center">Belum ada ajuan surat baru.</td>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-gray-500 mb-2"><i class="fas fa-inbox fa-2x"></i></div>
+                                    <div>Belum ada ajuan surat baru.</div>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>

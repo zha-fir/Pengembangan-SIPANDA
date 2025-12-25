@@ -22,39 +22,62 @@
             <i class="fas fa-plus"></i> Tambah Data Surat
         </a>
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
                         <th>Nama Surat</th>
-                        <th>Kode Surat</th>
+                        <th class="text-center" width="15%">Kode Surat</th>
                         <th>File Template</th>
-                        <th>Aksi</th>
+                        <th class="text-center" width="15%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($suratList as $surat)
                     <tr>
-                        <td>{{ $surat->nama_surat }}</td>
-                        <td>{{ $surat->kode_surat }}</td>
-                        <td>{{ $surat->template_file }}</td>
-                        <td>
-                            <a href="{{ route('jenis-surat.edit', $surat->id_jenis_surat) }}" class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <form action="{{ route('jenis-surat.destroy', $surat->id_jenis_surat) }}" method="POST" 
-                                class="d-inline" 
-                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus template surat ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
-                            </form>
+                        <td class="align-middle">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-2">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                </div>
+                                <span class="font-weight-bold text-dark">{{ $surat->nama_surat }}</span>
+                            </div>
+                        </td>
+                        <td class="align-middle text-center">
+                            <span class="badge badge-secondary px-2 py-1">{{ $surat->kode_surat }}</span>
+                        </td>
+                        <td class="align-middle">
+                            @if($surat->template_file)
+                                <div class="text-muted small">
+                                    <i class="fas fa-paperclip mr-1"></i> {{ $surat->template_file }}
+                                </div>
+                            @else
+                                <span class="text-danger small">Tidak ada file</span>
+                            @endif
+                        </td>
+                        <td class="align-middle text-center">
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ route('jenis-surat.edit', $surat->id_jenis_surat) }}" class="btn btn-warning btn-circle btn-sm mr-1" title="Edit Data">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('jenis-surat.destroy', $surat->id_jenis_surat) }}" method="POST" 
+                                    class="d-inline" 
+                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus template surat ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-circle btn-sm" title="Hapus Data">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="text-center">Data masih kosong.</td>
+                        <td colspan="4" class="text-center py-4">
+                            <div class="text-gray-500">Data Jenis Surat belum tersedia.</div>
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>

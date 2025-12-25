@@ -11,52 +11,76 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable">
-                <thead>
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
-                        <th>No. Surat</th>
+                        <th class="text-center" width="15%">No. Surat</th>
                         <th>Pemohon (NIK)</th>
                         <th>Jenis Surat</th>
                         <th>Penandatangan</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center" width="15%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($arsipList as $arsip)
                     <tr>
-                        <td>{{ $arsip->nomor_surat ?? 'N/A' }}</td>
-                        <td>
-                            {{ $arsip->warga->nama_lengkap ?? 'N/A' }}
-                            <br><small>NIK: {{ $arsip->warga->nik ?? 'N/A' }}</small>
+                        <td class="align-middle text-center font-weight-bold">{{ $arsip->nomor_surat ?? '-' }}</td>
+                        <td class="align-middle">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-2">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="font-weight-bold text-dark">{{ optional($arsip->warga)->nama_lengkap ?? 'N/A' }}</span>
+                                    <br>
+                                    <small class="text-muted">NIK: {{ optional($arsip->warga)->nik ?? 'N/A' }}</small>
+                                </div>
+                            </div>
                         </td>
-                        <td>{{ $arsip->jenisSurat->nama_surat ?? 'N/A' }}</td>
-                        <td>{{ $arsip->pejabatDesa->nama_pejabat ?? 'N/A' }}</td> {{-- Ganti ke pejabatDesa --}}
-                        <td>
+                        <td class="align-middle">
+                            <i class="fas fa-file-alt text-primary mr-1"></i>
+                            {{ optional($arsip->jenisSurat)->nama_surat ?? 'N/A' }}
+                        </td>
+                        <td class="align-middle">{{ optional($arsip->pejabatDesa)->nama_pejabat ?? '-' }}</td>
+                        <td class="align-middle text-center">
                             @if($arsip->status == 'SELESAI')
-                                <span class="badge badge-success">SELESAI</span>
+                                <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i>SELESAI</span>
                             @else
-                                <span class="badge badge-danger">DITOLAK</span>
+                                <span class="badge badge-danger px-2 py-1"><i class="fas fa-times-circle mr-1"></i>DITOLAK</span>
                             @endif
                         </td>
-                        <td>
-                            <a href="{{ route('ajuan-surat.detail', $arsip->id_ajuan) }}" class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i> Detail
-                            </a>
-
-                            {{-- Hanya tampilkan tombol Cetak jika status SELESAI --}}
-                            @if($arsip->status == 'SELESAI')
-                                <a href="{{ route('ajuan-surat.cetak', $arsip->id_ajuan) }}" class="btn btn-sm btn-primary" target="_blank">
-                                    <i class="fas fa-print"></i> Cetak Word
+                        <td class="align-middle text-center">
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ route('ajuan-surat.detail', $arsip->id_ajuan) }}" class="btn btn-info btn-circle btn-sm mr-1" title="Lihat Detail">
+                                    <i class="fas fa-eye"></i>
                                 </a>
-                            @endif
+
+                                {{-- Hanya tampilkan tombol Cetak jika status SELESAI --}}
+                                @if($arsip->status == 'SELESAI')
+                                    <a href="{{ route('ajuan-surat.cetak', $arsip->id_ajuan) }}" class="btn btn-primary btn-circle btn-sm" target="_blank" title="Cetak Surat">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="text-center">Belum ada surat di arsip.</td></tr>
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-gray-500 mb-2"><i class="fas fa-archive fa-2x"></i></div>
+                            <div>Belum ada surat di arsip.</div>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
+            {{-- Pagination Links --}}
+            <div class="mt-3">
+                {{ $arsipList->links() }}
+            </div>
         </div>
     </div>
 </div>

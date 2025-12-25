@@ -23,8 +23,13 @@ class AjuanSuratController extends Controller
                                 ->orderBy('tanggal_ajuan', 'asc')
                                 ->get();
 
-        // Ambil daftar pejabat untuk dropdown di modal
-        $pejabatList = PejabatDesa::all();
+        // Ambil daftar pejabat untuk dropdown di modal (Safe Mode)
+        try {
+            $pejabatList = PejabatDesa::all();
+        } catch (\Exception $e) {
+            $pejabatList = collect([]);
+            session()->now('error', 'Gagal memuat data Pejabat Desa. Pastikan tabel tersedia. Error: ' . $e->getMessage());
+        }
 
         return view('admin.ajuan-surat.index', compact('ajuanList', 'pejabatList'));
     }
@@ -34,12 +39,19 @@ class AjuanSuratController extends Controller
      */
     public function arsip()
     {
-        $arsipList = AjuanSurat::with('warga', 'jenisSurat', 'pejabatDesa') // <-- Ganti ke pejabatDesa
-                                ->whereIn('status', ['SELESAI', 'DITOLAK'])
-                                ->orderBy('tanggal_ajuan', 'desc')
-                                ->get();
-
-        return view('admin.ajuan-surat.arsip', compact('arsipList'));
+        try {
+            $arsipList = AjuanSurat::with('warga', 'jenisSurat', 'pejabatDesa') 
+                                    ->whereIn('status', ['SELESAI', 'DITOLAK'])
+                                    ->orderBy('tanggal_ajuan', 'desc')
+                                    ->paginate(10);
+            
+            return view('admin.ajuan-surat.arsip', compact('arsipList'));
+        } catch (\Exception $e) {
+            // Fallback: Return empty paginator + Error Message
+            $arsipList = AjuanSurat::whereRaw('1 = 0')->paginate(10);
+            return view('admin.ajuan-surat.arsip', compact('arsipList'))
+                    ->with('error', 'Terjadi kesalahan memuat arsip (Database Error): ' . $e->getMessage());
+        }
     }
 
     /**
@@ -113,14 +125,14 @@ class AjuanSuratController extends Controller
             // ==========================================
             // A. DATA STATIS WARGA
             // ==========================================
-            $templateProcessor->setValue('nama_lengkap', strtoupper($warga->nama_lengkap));
+            $templateProcessor->setValue('nama_lengkap', ucwords(strtolower($warga->nama_lengkap)));
             $templateProcessor->setValue('nik', $warga->nik);
             $templateProcessor->setValue('tempat_lahir', ucwords(strtolower($warga->tempat_lahir)));
             $templateProcessor->setValue('tanggal_lahir', \Carbon\Carbon::parse($warga->tanggal_lahir)->isoFormat('D MMMM Y'));
             $templateProcessor->setValue('jenis_kelamin', ucwords(strtolower($warga->jenis_kelamin)));
             $templateProcessor->setValue('agama', ucwords(strtolower($warga->agama)));
             $templateProcessor->setValue('pekerjaan', ucwords(strtolower($warga->pekerjaan)));
-            $templateProcessor->setValue('kewarganegaraan', strtoupper($warga->kewarganegaraan));
+            $templateProcessor->setValue('kewarganegaraan', ucwords(strtolower($warga->kewarganegaraan)));
 
             // Alamat & Dusun
             $alamatKecil = ucwords(strtolower($kk->alamat_kk ?? '-'));
@@ -152,7 +164,7 @@ class AjuanSuratController extends Controller
             // Pejabat 1 (Kanan)
             if ($ajuan->pejabatDesa) {
                 $p1 = $ajuan->pejabatDesa;
-                $templateProcessor->setValue('nama_pejabat', strtoupper($p1->nama_pejabat));
+                $templateProcessor->setValue('nama_pejabat', ucwords(strtolower($p1->nama_pejabat)));
                 $templateProcessor->setValue('jabatan_pejabat', ucwords(strtolower($p1->jabatan)));
                 $templateProcessor->setValue('nip_pejabat', $p1->nip ?? '-');
                 
@@ -168,7 +180,7 @@ class AjuanSuratController extends Controller
             // Pejabat 2 (Kiri - Opsional)
             if ($ajuan->pejabatDesa2) {
                 $p2 = $ajuan->pejabatDesa2;
-                $templateProcessor->setValue('nama_pejabat_2', strtoupper($p2->nama_pejabat));
+                $templateProcessor->setValue('nama_pejabat_2', ucwords(strtolower($p2->nama_pejabat)));
                 $templateProcessor->setValue('jabatan_pejabat_2', ucwords(strtolower($p2->jabatan)));
                 $templateProcessor->setValue('nip_pejabat_2', $p2->nip ?? '-');
                 
@@ -225,12 +237,12 @@ class AjuanSuratController extends Controller
                     // Masukkan ke array
                     $dataTabel[] = [
                         't_no'   => $no++,
-                        't_nama' => strtoupper($anggota->nama_lengkap),
+                        't_nama' => ucwords(strtolower($anggota->nama_lengkap)),
                         't_ttl'  => ucwords(strtolower($anggota->tempat_lahir ?? '-')) . ', ' . $tglLahirAnggota,
                         't_jk'   => ucwords(strtolower($anggota->jenis_kelamin)),
                         't_kk'   => $kk->no_kk,
                         't_nik'  => $anggota->nik,
-                        't_hub'  => $anggota->status_dalam_keluarga ?? '-'
+                        't_hub'  => ucwords(strtolower($anggota->status_dalam_keluarga ?? '-'))
                     ];
                 }
 

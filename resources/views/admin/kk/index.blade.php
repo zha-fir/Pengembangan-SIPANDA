@@ -52,56 +52,66 @@
 
             </div>
             <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-light">
                         <tr>
                             <th>Nomor KK</th>
                             <th>Kepala Keluarga</th>
                             <th>Dusun</th>
-                            <th>RT/RW</th>
-                            <th>Aksi</th>
+                            <th class="text-center" width="10%">RT / RW</th>
+                            <th class="text-center" width="15%">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($kkList as $kk)
                             <tr>
-                                <td>{{ $kk->no_kk }}</td>
-                                <td>
+                                <td class="align-middle font-weight-bold">{{ $kk->no_kk }}</td>
+                                <td class="align-middle">
                                     @if($kk->kepalaKeluarga)
-                                        {{-- Jika ada warga yang statusnya KEPALA KELUARGA, tampilkan datanya --}}
-                                        <strong>{{ $kk->kepalaKeluarga->nama_lengkap }}</strong><br>
-                                        <small class="text-muted">NIK: {{ $kk->kepalaKeluarga->nik }}</small>
+                                        <div class="d-flex align-items-center">
+                                            <div class="mr-2">
+                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="font-weight-bold text-dark">{{ $kk->kepalaKeluarga->nama_lengkap }}</span>
+                                                <br>
+                                                <small class="text-muted">NIK: {{ $kk->kepalaKeluarga->nik }}</small>
+                                            </div>
+                                        </div>
                                     @else
-                                        {{-- Fallback ke teks manual jika belum di-set --}}
-                                        {{ $kk->nama_kepala_keluarga }} <span class="text-danger">(Data Belum Link)</span>
+                                        {{ $kk->nama_kepala_keluarga }} <span class="badge badge-danger ml-1">Data Belum Link</span>
                                     @endif
                                 </td>
-                                <td>{{ $kk->rt }}/{{ $kk->rw }}</td>
-                                {{-- ... (Di dalam loop @forelse) ... --}}
-                                <td>
-                                    <a href="{{ route('kk.members', $kk->id_kk) }}" class="btn btn-sm btn-info">
-                                        <i class="fas fa-users"></i> Anggota
-                                    </a>
+                                <td class="align-middle">{{ $kk->dusun->nama_dusun ?? '-' }}</td>
+                                <td class="align-middle text-center">{{ $kk->rt }} / {{ $kk->rw }}</td>
+                                <td class="align-middle text-center">
+                                    <div class="d-flex justify-content-center">
+                                        <a href="{{ route('kk.members', $kk->id_kk) }}" class="btn btn-info btn-circle btn-sm mr-1" title="Lihat Anggota">
+                                            <i class="fas fa-users"></i>
+                                        </a>
 
-                                    {{-- 1. Perbaiki link Edit --}}
-                                    <a href="{{ route('kk.edit', $kk->id_kk) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
+                                        <a href="{{ route('kk.edit', $kk->id_kk) }}" class="btn btn-warning btn-circle btn-sm mr-1" title="Edit Data">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
-                                    {{-- 2. Ubah link Hapus menjadi Form --}}
-                                    <form action="{{ route('kk.destroy', $kk->id_kk) }}" method="POST" class="d-inline"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus data KK ini? SEMUA warga yang terhubung juga akan terpengaruh.');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash"></i> Hapus
-                                        </button>
-                                    </form>
+                                        <form action="{{ route('kk.destroy', $kk->id_kk) }}" method="POST" class="d-inline"
+                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus data KK ini? SEMUA warga yang terhubung juga akan terpengaruh.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-circle btn-sm" title="Hapus Data">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center">Data masih kosong.</td>
+                                <td colspan="5" class="text-center py-4">
+                                    <div class="text-gray-500">Data Kartu Keluarga belum tersedia.</div>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>

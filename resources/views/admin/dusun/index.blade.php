@@ -27,42 +27,54 @@
         </a>
         
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <thead class="thead-light">
                     <tr>
-                        <th>ID</th>
+                        <th width="10%" class="text-center">ID</th>
                         <th>Nama Dusun</th>
-                        <th>Aksi</th>
+                        <th class="text-center" width="15%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{-- Loop data dusunList dari Controller --}}
                     @forelse ($dusunList as $dusun)
                     <tr>
-                        {{-- PASTIKAN DUA BARIS INI ADA --}}
-                        <td>{{ $dusun->id_dusun }}</td>
-                        <td>{{ $dusun->nama_dusun }}</td>
+                        <td class="align-middle text-center">{{ $dusun->id_dusun }}</td>
+                        <td class="align-middle">
+                            <div class="d-flex align-items-center">
+                                <div class="mr-2">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                </div>
+                                <span class="font-weight-bold text-dark">{{ $dusun->nama_dusun }}</span>
+                            </div>
+                        </td>
 
-                        {{-- Ini adalah kode untuk Tombol Aksi --}}
-                        <td>
-                            <a href="{{ route('dusun.edit', $dusun->id_dusun) }}" class="btn btn-sm btn-warning">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
+                        {{-- Tombol Aksi --}}
+                        <td class="align-middle text-center">
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ route('dusun.edit', $dusun->id_dusun) }}" class="btn btn-warning btn-circle btn-sm mr-1" title="Edit Data">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
-                            <form action="{{ route('dusun.destroy', $dusun->id_dusun) }}" method="POST" 
-                                class="d-inline" 
-                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
-                            </form>
+                                <form action="{{ route('dusun.destroy', $dusun->id_dusun) }}" method="POST" 
+                                    class="d-inline" 
+                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-circle btn-sm" title="Hapus Data">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="3" class="text-center">Data masih kosong.</td>
+                        <td colspan="3" class="text-center py-4">
+                            <div class="text-gray-500">Data Dusun belum tersedia.</div>
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>

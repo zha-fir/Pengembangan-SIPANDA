@@ -32,19 +32,19 @@
                 <table class="table table-sm table-borderless">
                     <tr>
                         <th style="width: 150px;">Nama Lengkap</th>
-                        <td>: {{ $ajuan->warga->nama_lengkap }}</td>
+                        <td>: {{ optional($ajuan->warga)->nama_lengkap ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <th>NIK</th>
-                        <td>: {{ $ajuan->warga->nik }}</td>
+                        <td>: {{ optional($ajuan->warga)->nik ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <th>Tempat, Tgl Lahir</th>
-                        <td>: {{ $ajuan->warga->tempat_lahir }}, {{ $ajuan->warga->tanggal_lahir ? \Carbon\Carbon::parse($ajuan->warga->tanggal_lahir)->isoFormat('D MMMM Y') : 'N/A' }}</td>
+                        <td>: {{ optional($ajuan->warga)->tempat_lahir ?? 'N/A' }}, {{ optional($ajuan->warga)->tanggal_lahir ? \Carbon\Carbon::parse($ajuan->warga->tanggal_lahir)->isoFormat('D MMMM Y') : 'N/A' }}</td>
                     </tr>
                     <tr>
                         <th>Alamat</th>
-                        <td>: {{ $ajuan->warga->kk->alamat_kk ?? 'N/A' }}</td>
+                        <td>: {{ optional(optional($ajuan->warga)->kk)->alamat_kk ?? 'N/A' }}</td>
                     </tr>
                 </table>
             </div>
@@ -55,7 +55,7 @@
                 <table class="table table-sm table-borderless">
                     <tr>
                         <th style="width: 150px;">Jenis Surat</th>
-                        <td>: {{ $ajuan->jenisSurat->nama_surat }}</td>
+                        <td>: {{ optional($ajuan->jenisSurat)->nama_surat ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <th>Keperluan</th>
@@ -67,11 +67,11 @@
                     </tr>
                     <tr>
                         <th>Penandatangan</th>
-                        <td>: {{ $ajuan->pejabatDesa->nama_pejabat ?? 'N/A' }}</td>
+                        <td>: {{ optional($ajuan->pejabatDesa)->nama_pejabat ?? 'N/A' }}</td>
                     </tr>
                     <tr>
                         <th>Jabatan</th>
-                        <td>: {{ $ajuan->pejabatDesa->jabatan ?? 'N/A' }}</td>
+                        <td>: {{ optional($ajuan->pejabatDesa)->jabatan ?? 'N/A' }}</td>
                     </tr>
                 </table>
             </div>
