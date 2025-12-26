@@ -20,6 +20,7 @@ use App\Http\Controllers\Kades\MonitoringController;
 use App\Http\Controllers\Kades\PendudukController;
 use App\Http\Controllers\Kades\LaporanController;
 use App\Http\Controllers\Kadus\DashboardController as KadusDashboard;
+use App\Http\Controllers\ApprovalController; // <-- New Import
 
 // ==========================================================
 // 1. ZONA PUBLIK (TIDAK PERLU LOGIN)
@@ -110,14 +111,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/monitoring-surat', [MonitoringController::class, 'index'])->name('kades.monitoring.index');
         Route::get('/monitoring-surat/{id}', [MonitoringController::class, 'show'])->name('kades.monitoring.show');
         
+        // Persetujuan Surat (Approval)
+        Route::get('/approval', [ApprovalController::class, 'index'])->name('kades.approval.index');
+        
+        // Data Penduduk (Read Only)
+        
         // Data Penduduk (Read Only)
         Route::get('/penduduk', [PendudukController::class, 'index'])->name('kades.penduduk.index');
         Route::get('/penduduk/{id}', [PendudukController::class, 'show'])->name('kades.penduduk.show');
         
         // Laporan
         Route::get('/laporan', [LaporanController::class, 'index'])->name('kades.laporan.index');
-        Route::get('/laporan/penduduk/cetak', [LaporanController::class, 'cetakPenduduk'])->name('kades.laporan.cetak-penduduk');
-        Route::get('/laporan/surat/cetak', [LaporanController::class, 'cetakSurat'])->name('kades.laporan.cetak-surat');
+        Route::get('/laporan/penduduk/cetak', [LaporanController::class, 'cetakPenduduk'])->name('kades.laporan.cetakPenduduk');
+        Route::get('/laporan/surat/cetak', [LaporanController::class, 'cetakSurat'])->name('kades.laporan.cetakSurat');
     });
 
 
@@ -126,6 +132,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [KadusDashboard::class, 'index'])->name('kadus.dashboard');
         Route::get('/warga', [KadusDashboard::class, 'warga'])->name('kadus.warga');
         Route::get('/surat', [KadusDashboard::class, 'surat'])->name('kadus.surat');
+
+        // Persetujuan Surat (Approval)
+        Route::get('/approval', [ApprovalController::class, 'index'])->name('kadus.approval.index');
+        // Route approve post sudah didefine di atas (shared), tapi perlu akses middleware. 
+        // Sebaiknya definisikan ulang atau pastikan nama route unik jika prefix beda.
+        // TAPI karena approval.approve dipanggil form action, kita butuh satu route yang bisa diakses kedua role.
+    });
+    
+    // Route Khusus Approval (Bisa diakses Kades & Kadus)
+    Route::middleware(['auth', 'role:kades,kadus'])->group(function() {
+         Route::post('/approval/{ajuan}/approve', [ApprovalController::class, 'approve'])->name('approval.approve');
     });
 
 });

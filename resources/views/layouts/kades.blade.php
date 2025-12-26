@@ -101,6 +101,18 @@
             <hr class="sidebar-divider">
 
             <div class="sidebar-heading">
+                Tanda Tangan Digital
+            </div>
+
+            <li class="nav-item @if(Request::is('kades/approval*')) active @endif">
+                <a class="nav-link" href="{{ route('kades.approval.index') }}">
+                    <i class="fas fa-fw fa-file-signature"></i>
+                    <span>Persetujuan Surat</span></a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">
                 Monitoring & Laporan
             </div>
 

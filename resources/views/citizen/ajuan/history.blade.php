@@ -67,6 +67,10 @@
                                             <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
                                                 <i class="fas fa-clock me-1"></i> Proses
                                             </span>
+                                        @elseif($ajuan->status == 'MENUNGGU_TTD')
+                                            <span class="badge bg-warning rounded-pill px-3 py-2 text-dark">
+                                                <i class="fas fa-file-signature me-1"></i> Menunggu Tanda Tangan
+                                            </span>
                                         @elseif($ajuan->status == 'SELESAI')
                                             <span class="badge bg-success rounded-pill px-3 py-2">
                                                 <i class="fas fa-check-circle me-1"></i> Selesai
@@ -94,6 +98,10 @@
                                                 <i class="fas fa-exclamation-circle me-1"></i> <strong>Alasan:</strong><br>
                                                 {{ $ajuan->catatan_penolakan }}
                                             </div>
+                                        @elseif($ajuan->status == 'MENUNGGU_TTD')
+                                            <span class="text-primary small fst-italic">
+                                                <i class="fas fa-clock"></i> Menunggu tanda tangan pejabat...
+                                            </span>
                                         @else
                                             <span class="text-muted small fst-italic">Menunggu konfirmasi admin...</span>
                                         @endif

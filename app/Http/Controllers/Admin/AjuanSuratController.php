@@ -67,8 +67,15 @@ class AjuanSuratController extends Controller
 
         $ajuan->nomor_surat = $request->nomor_surat;
         $ajuan->id_pejabat_desa = $request->id_pejabat_desa;
-        $ajuan->id_pejabat_desa_2 = $request->id_pejabat_desa_2; // <-- Simpan
-        $ajuan->status = 'SELESAI';
+        $ajuan->id_pejabat_desa_2 = $request->id_pejabat_desa_2; 
+        
+        // UBAH LOGIKA: Tidak langsung SELESAI, tapi MENUNGGU_TTD
+        $ajuan->status = 'MENUNGGU_TTD';
+        
+        // Reset approval (jika di-confirm ulang)
+        $ajuan->acc_at_pejabat_1 = null;
+        $ajuan->acc_at_pejabat_2 = null;
+        
         $ajuan->catatan_penolakan = null;
         $ajuan->save();
 
@@ -196,6 +203,14 @@ class AjuanSuratController extends Controller
                 
                 $umurP2 = ($p2->tanggal_lahir) ? \Carbon\Carbon::parse($p2->tanggal_lahir)->age . ' Tahun' : '-';
                 $templateProcessor->setValue('umur_pejabat_2', $umurP2);
+
+                // LOGIKA TANDA TANGAN 2
+                if ($p2->ttd_path && Storage::exists($p2->ttd_path)) {
+                    $pathTTD2 = Storage::path($p2->ttd_path);
+                    $templateProcessor->setImageValue('tanda_tangan_2', ['path' => $pathTTD2, 'width' => 200, 'height' => 120, 'ratio' => true]);
+                } else {
+                    $templateProcessor->setValue('tanda_tangan_2', ' ');
+                }
             } else {
                 // Kosongkan string agar bersih di Word
                 $templateProcessor->setValue('nama_pejabat_2', '');

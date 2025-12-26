@@ -9,5 +9,10 @@ class PejabatDesa extends Model
     protected $table = 'tabel_pejabat_desa';
     protected $primaryKey = 'id_pejabat_desa';
     public $timestamps = false;
-    protected $fillable = ['nama_pejabat', 'jabatan', 'nip', 'tanggal_lahir', 'ttd_path'];
+    protected $fillable = ['nama_pejabat', 'jabatan', 'nip', 'tanggal_lahir', 'ttd_path', 'id_user'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
 }

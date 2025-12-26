@@ -204,6 +204,14 @@ class AjuanSuratController extends Controller
                 
                 $umurP2 = ($p2->tanggal_lahir) ? \Carbon\Carbon::parse($p2->tanggal_lahir)->age . ' Tahun' : '-';
                 $templateProcessor->setValue('umur_pejabat_2', $umurP2);
+
+                // LOGIKA TANDA TANGAN 2
+                if ($p2->ttd_path && \Illuminate\Support\Facades\Storage::exists($p2->ttd_path)) {
+                    $pathTTD2 = \Illuminate\Support\Facades\Storage::path($p2->ttd_path);
+                    $templateProcessor->setImageValue('tanda_tangan_2', ['path' => $pathTTD2, 'width' => 200, 'height' => 120, 'ratio' => true]);
+                } else {
+                    $templateProcessor->setValue('tanda_tangan_2', ' ');
+                }
             } else {
                 $templateProcessor->setValue('nama_pejabat_2', '');
                 $templateProcessor->setValue('jabatan_pejabat_2', '');

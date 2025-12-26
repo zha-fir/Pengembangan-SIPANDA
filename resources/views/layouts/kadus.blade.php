@@ -112,6 +112,18 @@
                     <span>Monitoring Surat</span></a>
             </li>
 
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">
+                Tanda Tangan
+            </div>
+
+            <li class="nav-item @if(Request::is('kadus/approval*')) active @endif">
+                <a class="nav-link" href="{{ route('kadus.approval.index') }}">
+                    <i class="fas fa-fw fa-file-signature"></i>
+                    <span>Persetujuan Surat</span></a>
+            </li>
+
             <hr class="sidebar-divider d-none d-md-block">
 
             <div class="text-center d-none d-md-inline">
