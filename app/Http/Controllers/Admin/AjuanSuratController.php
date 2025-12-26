@@ -170,11 +170,21 @@ class AjuanSuratController extends Controller
                 
                 $umurP1 = ($p1->tanggal_lahir) ? \Carbon\Carbon::parse($p1->tanggal_lahir)->age . ' Tahun' : '-';
                 $templateProcessor->setValue('umur_pejabat', $umurP1);
+
+                // LOGIKA TANDA TANGAN DIGITAL (Admin/Cetak)
+                if ($p1->ttd_path && Storage::exists($p1->ttd_path)) {
+                    $pathTTD = Storage::path($p1->ttd_path);
+                    $templateProcessor->setImageValue('tanda_tangan', ['path' => $pathTTD, 'width' => 200, 'height' => 120, 'ratio' => true]);
+                } else {
+                    $templateProcessor->setValue('tanda_tangan', ' '); // Kosongkan
+                }
+
             } else {
                 $templateProcessor->setValue('nama_pejabat', '-');
                 $templateProcessor->setValue('jabatan_pejabat', '-');
                 $templateProcessor->setValue('nip_pejabat', '-');
                 $templateProcessor->setValue('umur_pejabat', '-');
+                $templateProcessor->setValue('tanda_tangan', ' ');
             }
 
             // Pejabat 2 (Kiri - Opsional)

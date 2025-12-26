@@ -83,6 +83,11 @@
                                             <div class="alert alert-success py-2 px-3 mb-0 border-0 small" style="background-color: #d1e7dd;">
                                                 <i class="fas fa-check me-1"></i> Surat diterbitkan.<br>
                                                 <strong>No: {{ $ajuan->nomor_surat }}</strong>
+                                                <div class="mt-2">
+                                                    <a href="{{ route('warga.ajuan.download', $ajuan->id_ajuan) }}" class="btn btn-sm btn-success shadow-sm" target="_blank">
+                                                        <i class="fas fa-download me-1"></i> Unduh Surat
+                                                    </a>
+                                                </div>
                                             </div>
                                         @elseif($ajuan->status == 'DITOLAK')
                                             <div class="alert alert-danger py-2 px-3 mb-0 border-0 small" style="background-color: #f8d7da;">

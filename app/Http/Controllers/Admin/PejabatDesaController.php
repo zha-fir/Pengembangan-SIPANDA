@@ -46,6 +46,17 @@ class PejabatDesaController extends Controller
         $pejabat->jabatan = $request->jabatan;
         $pejabat->nip = $request->nip;
         $pejabat->tanggal_lahir = $request->tanggal_lahir;
+
+        // Handle Upload TTD
+        if ($request->hasFile('ttd_image')) {
+            $request->validate([
+                'ttd_image' => 'image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+            ]);
+            // Simpan ke storage public
+            $path = $request->file('ttd_image')->store('public/ttd');
+            $pejabat->ttd_path = $path;
+        }
+
         $pejabat->save();
 
         // 3. Logika Pembuatan Akun Login (Jika dicentang)
@@ -86,6 +97,22 @@ class PejabatDesaController extends Controller
         $pejabatDesa->jabatan = $request->jabatan;
         $pejabatDesa->nip = $request->nip;
         $pejabatDesa->tanggal_lahir = $request->tanggal_lahir;
+
+        // Handle Upload TTD (Update)
+        if ($request->hasFile('ttd_image')) {
+            $request->validate([
+                'ttd_image' => 'image|mimes:jpeg,png,jpg|max:2048',
+            ]);
+            
+            // Hapus file lama jika ada (opsional, praktik baik)
+            if ($pejabatDesa->ttd_path && \Illuminate\Support\Facades\Storage::exists($pejabatDesa->ttd_path)) {
+                \Illuminate\Support\Facades\Storage::delete($pejabatDesa->ttd_path);
+            }
+
+            $path = $request->file('ttd_image')->store('public/ttd');
+            $pejabatDesa->ttd_path = $path;
+        }
+
         $pejabatDesa->save();
 
         return Redirect::route('pejabat-desa.index')->with('success', 'Data pejabat desa berhasil diperbarui.');

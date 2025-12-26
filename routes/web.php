@@ -59,6 +59,9 @@ Route::middleware('auth')->group(function () {
         // Profil & Password
         Route::get('/profil/password', [ProfileController::class, 'editPassword'])->name('warga.password.edit');
         Route::post('/profil/password', [ProfileController::class, 'updatePassword'])->name('warga.password.update');
+
+        // Download Surat
+        Route::get('/ajuan-surat/{ajuan}/download', [CitizenAjuanSuratController::class, 'downloadSurat'])->name('warga.ajuan.download');
     });
 
 

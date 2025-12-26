@@ -17,7 +17,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('pejabat-desa.store') }}" method="POST">
+            <form action="{{ route('pejabat-desa.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <h5 class="text-primary font-weight-bold">Data Pejabat (Untuk Tanda Tangan)</h5>
@@ -42,6 +42,13 @@
                         <label>Tanggal Lahir (Untuk Hitung Umur)</label>
                         <input type="date" class="form-control" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}">
                     </div>
+                </div>
+
+                {{-- Input Tanda Tangan --}}
+                <div class="form-group">
+                    <label class="text-danger font-weight-bold">Upload Scan Tanda Tangan (Wajib untuk Surat Digital)</label>
+                    <input type="file" class="form-control-file" name="ttd_image" accept="image/*">
+                    <small class="text-muted">Format: JPG/PNG, Maks: 2MB. Usahakan background transparan.</small>
                 </div>
 
                 <hr>
