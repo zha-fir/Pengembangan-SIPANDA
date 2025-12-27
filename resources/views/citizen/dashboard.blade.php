@@ -29,7 +29,7 @@
                     <p class="lead mb-4" style="opacity: 0.9;">Selamat datang di SIPANDA, Sistem Pelayanan Administrasi Desa
                         Panggulo.</p>
                     <a href="{{ route('warga.ajuan.create') }}"
-                        class="btn btn-light text-primary fw-bold px-4 py-2 shadow-sm">
+                        class="btn btn-light text-primary fw-bold px-4 py-2 shadow-sm w-100 d-block d-md-inline-block">
                         <i class="fas fa-plus-circle me-2"></i>Buat Pengajuan Baru
                     </a>
                 </div>
@@ -47,7 +47,8 @@
                     </a>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive">
+                    {{-- Desktop View (Table) --}}
+                    <div class="table-responsive d-none d-md-block">
                         <table class="table table-hover mb-0 align-middle">
                             <thead class="bg-light text-muted">
                                 <tr>
@@ -59,26 +60,20 @@
                             <tbody>
                                 @forelse ($riwayatAjuan as $ajuan)
                                     <tr>
-                                        {{-- KOLOM 1: JENIS SURAT --}}
                                         <td class="ps-4">
                                             <span class="fw-bold text-dark d-block">
                                                 {{ $ajuan->jenisSurat->nama_surat ?? 'Jenis Surat Telah Dihapus' }}
                                             </span>
-                                            {{-- Menampilkan sedikit preview keperluan --}}
                                             <small class="text-muted" style="font-size: 0.8rem;">
                                                 {{ Str::limit($ajuan->keperluan, 30) }}
                                             </small>
                                         </td>
-
-                                        {{-- KOLOM 2: TANGGAL --}}
                                         <td>
                                             <div class="text-muted small">
                                                 <i class="far fa-calendar-alt me-1"></i>
-                                                {{ \Carbon\Carbon::parse($ajuan->tanggal_ajuan)->isoFormat('dddd, D MMMM Y') }}
+                                                {{ \Carbon\Carbon::parse($ajuan->tanggal_ajuan)->isoFormat('D MMM Y') }}
                                             </div>
                                         </td>
-
-                                        {{-- KOLOM 3: STATUS --}}
                                         <td>
                                             @if($ajuan->status == 'BARU')
                                                 <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
@@ -107,6 +102,39 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    {{-- Mobile View (Cards) --}}
+                    <div class="d-md-none">
+                        @forelse ($riwayatAjuan as $ajuan)
+                            <div class="p-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="fw-bold text-dark d-block">
+                                            {{ $ajuan->jenisSurat->nama_surat ?? 'Jenis Surat Dihapus' }}
+                                        </span>
+                                        <small class="text-muted">
+                                            {{ \Carbon\Carbon::parse($ajuan->tanggal_ajuan)->isoFormat('D MMMM Y') }}
+                                        </small>
+                                    </div>
+                                    @if($ajuan->status == 'BARU')
+                                        <span class="badge bg-warning text-dark rounded-pill">Proses</span>
+                                    @elseif($ajuan->status == 'SELESAI')
+                                        <span class="badge bg-success rounded-pill">Selesai</span>
+                                    @elseif($ajuan->status == 'DITOLAK')
+                                        <span class="badge bg-danger rounded-pill">Ditolak</span>
+                                    @endif
+                                </div>
+                                <p class="small text-muted mb-0 bg-light p-2 rounded">
+                                    <i class="fas fa-info-circle me-1"></i> {{ Str::limit($ajuan->keperluan, 60) }}
+                                </p>
+                            </div>
+                        @empty
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-inbox fa-3x opacity-25 mb-2"></i>
+                                <p class="mb-0">Belum ada pengajuan surat.</p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
             </div>

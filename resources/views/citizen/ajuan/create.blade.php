@@ -39,6 +39,9 @@
                             </option>
                         @endforeach
                     </select>
+                    <div class="form-text text-primary">
+                        <i class="fas fa-info-circle me-1"></i> Pilih jenis surat di atas, formulir isian akan muncul otomatis di bawah.
+                    </div>
                 </div>
 
                 {{-- ================================================= --}}
@@ -193,7 +196,7 @@
                     <a href="{{ route('warga.dashboard') }}" class="btn btn-secondary text-white"
                         style="text-decoration: none;">Batal</a>
                     <button type="submit" class="btn btn-primary px-4">
-                        <i class="fas fa-paper-plane me-2"></i>Ajukan Surat
+                        <i class="fas fa-paper-plane me-2"></i>Kirim Permohonan
                     </button>
                 </div>
             </form>
@@ -214,30 +217,30 @@
                 var selectedText = $(this).find("option:selected").text().toLowerCase();
 
                 // 2. RESET: Sembunyikan SEMUA form tambahan & Kosongkan isinya
-                $('.extra-form').addClass('d-none');
+                $('.extra-form').addClass('d-none').removeClass('animate__animated animate__fadeInUp');
                 $('.input-extra').val('');
 
                 // 3. LOGIKA DETEKSI (Tambahkan logika 'menumpang' di sini)
 
                 // SKU
                 if (selectedText.includes('usaha')) {
-                    $('#form_sku').removeClass('d-none');
+                    $('#form_sku').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
                 }
                 // SKTM
                 else if (selectedText.includes('miskin') || selectedText.includes('tidak mampu') || selectedText.includes('sktm')) {
-                    $('#form_sktm').removeClass('d-none');
+                    $('#form_sktm').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
                 }
                 // Kehilangan
                 else if (selectedText.includes('hilang') || selectedText.includes('kehilangan')) {
-                    $('#form_kehilangan').removeClass('d-none');
+                    $('#form_kehilangan').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
                 }
                 // Kematian
                 else if (selectedText.includes('mati') || selectedText.includes('meninggal')) {
-                    $('#form_kematian').removeClass('d-none');
+                    $('#form_kematian').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
                 }
                 // --- TAMBAHAN BARU UNTUK MENUMPANG ---
                 else if (selectedText.includes('menumpang')) {
-                    $('#form_menumpang').removeClass('d-none');
+                    $('#form_menumpang').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
                 }
 
             });
