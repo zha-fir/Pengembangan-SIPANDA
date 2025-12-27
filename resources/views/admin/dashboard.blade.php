@@ -1,277 +1,230 @@
-@extends('layouts.admin')
+@extends('layouts.modern')
 
-@section('title', 'Dashboard')
+@section('title', 'Dashboard Admin')
 
 @section('content')
+<div class="space-y-6">
 
-    <div class="row">
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <a href="{{ route('warga.index') }}" class="text-decoration-none">
-                <div class="card border-left-primary shadow h-100 py-2 hover-scale">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                    Total Penduduk</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $jumlahWarga }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-users fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
+    <!-- Welcome Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Dashboard Administrator</h1>
+            <p class="text-slate-500 text-sm mt-1">
+                Selamat datang kembali, <strong>{{ Auth::user()->nama_lengkap ?? 'Admin' }}</strong>.
+            </p>
         </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <a href="{{ route('kk.index') }}" class="text-decoration-none">
-                <div class="card border-left-success shadow h-100 py-2 hover-scale">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    Kartu Keluarga</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $jumlahKK }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-home fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="flex gap-2">
+            <a href="{{ route('warga.create') }}" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200">
+                <i class="fas fa-plus"></i> Tambah Penduduk
             </a>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <a href="{{ route('ajuan-surat.index') }}" class="text-decoration-none">
-                <div class="card border-left-warning shadow h-100 py-2 hover-scale">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                    Perlu Diproses</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $ajuanBaru }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-inbox fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-xl-3 col-md-6 mb-4">
-            <a href="{{ route('ajuan-surat.arsip') }}" class="text-decoration-none">
-                <div class="card border-left-info shadow h-100 py-2 hover-scale">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                    Surat Selesai</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $suratSelesai }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-archive fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <a href="{{ route('kk.create') }}" class="inline-flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors">
+                <i class="fas fa-plus"></i> KK Baru
             </a>
         </div>
     </div>
 
-    {{-- Tambahkan CSS sedikit agar ada efek saat mouse diarahkan --}}
-    <style>
-        .hover-scale {
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-
-        .hover-scale:hover {
-            transform: scale(1.05);
-            /* Membesar sedikit saat di-hover */
-            background-color: #f8f9fc;
-            /* Sedikit abu-abu */
-        }
-
-        /* Hilangkan garis bawah link */
-        a.text-decoration-none:hover {
-            text-decoration: none !important;
-        }
-    </style>
-
-    <div class="row">
-
-        <div class="col-lg-8 mb-4">
-
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-info"><i class="fas fa-info-circle me-2"></i> Informasi Sistem</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row align-items-center">
-
-                        <div class="col-auto pr-4"> {{-- pr-4 memberi jarak kanan --}}
-                            {{-- Pastikan file gambar ada di public/img/logo.png --}}
-                            <img src="{{ asset('img/Logo_Kabupaten.png') }}" alt="Logo Kabupaten"
-                                style="width: 80px; height: auto;">
-                        </div>
-
-                        <div class="col border-left pl-4"> {{-- border-left memberi garis pemisah --}}
-                            <p class="mb-1">Selamat datang di <strong>SIPANDA</strong> (Sistem Pelayanan Administrasi Desa).
-                            </p>
-                            <p class="mb-2 text-muted small">Desa Panggulo, Kabupaten Bone Bolango.</p>
-
-                            <hr class="my-2">
-
-                            <p class="mb-0 small font-weight-bold">Panduan Singkat:</p>
-                            <ul class="mt-1 mb-0 small pl-3">
-                                <li>Cek kelengkapan data sebelum konfirmasi.</li>
-                                <li>Lakukan backup arsip secara berkala.</li>
-                                <li>Jaga kerahasiaan akun.</li>
-                            </ul>
-                        </div>
-
-                    </div>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total Penduduk -->
+        <a href="{{ route('warga.index') }}" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+            <div class="relative z-10">
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Total Penduduk</p>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ number_format($jumlahWarga) }}</span>
+                    <span class="text-slate-400 text-sm">Jiwa</span>
                 </div>
             </div>
+            <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <i class="fas fa-users text-6xl text-indigo-600 transform translate-x-2 -translate-y-2"></i>
+            </div>
+        </a>
 
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    {{-- Ganti Judul jadi 3 --}}
-                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-history me-2"></i> Ajuan Surat Terakhir
-                    </h6>
-                    <a href="{{ route('ajuan-surat.index') }}" class="btn btn-sm btn-primary shadow-sm">Lihat Semua</a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover mb-0 align-middle">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="pl-4">Tanggal</th>
-                                    <th>Nama Warga</th>
-                                    <th>Jenis Surat</th>
-                                    <th class="text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($latestAjuan as $ajuan)
-                                    <tr>
-                                        <td class="pl-4 text-muted small">
-                                            {{ \Carbon\Carbon::parse($ajuan->tanggal_ajuan)->diffForHumans() }}
-                                        </td>
-                                        <td class="font-weight-bold">{{ $ajuan->warga->nama_lengkap ?? '-' }}</td>
-                                        <td>{{ $ajuan->jenisSurat->nama_surat ?? '-' }}</td>
-                                        <td class="text-center">
-                                            @if($ajuan->status == 'BARU')
-                                                <span class="badge badge-warning px-2">Baru</span>
-                                            @elseif($ajuan->status == 'SELESAI')
-                                                <span class="badge badge-success px-2">Selesai</span>
-                                            @else
-                                                <span class="badge badge-danger px-2">Ditolak</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">Belum ada aktivitas surat.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+        <!-- Total KK -->
+        <a href="{{ route('kk.index') }}" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+             <div class="relative z-10">
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Kartu Keluarga</p>
+                <div class="flex items-baseline gap-2">
+                     <span class="text-3xl font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">{{ number_format($jumlahKK) }}</span>
+                    <span class="text-slate-400 text-sm">KK</span>
                 </div>
             </div>
+             <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <i class="fas fa-home text-6xl text-emerald-600 transform translate-x-2 -translate-y-2"></i>
+            </div>
+        </a>
 
-        </div>
-
-        <div class="col-lg-4 mb-4">
-
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-chart-pie mr-1"></i> Demografi Penduduk
-                        <small class="text-muted ml-2">({{ $labelFilter }})</small>
-                    </h6>
-
-                    {{-- Form Filter Tahun --}}
-                    <form action="{{ route('admin.dashboard') }}" method="GET" class="form-inline">
-                        <select name="filter_tahun" class="custom-select custom-select-sm" onchange="this.form.submit()">
-                            <option value="">Semua Tahun</option>
-                            @foreach($tahunLahirList as $tahun)
-                                <option value="{{ $tahun }}" {{ request('filter_tahun') == $tahun ? 'selected' : '' }}>
-                                    {{ $tahun }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </form>
-                </div>
-
-                <div class="card-body">
-                    @if($totalFilter > 0)
-                        {{-- Info Persentase Laki-laki --}}
-                        <h4 class="small font-weight-bold">
-                            Laki-laki
-                            <span class="float-right">{{ $demografiLaki }} Jiwa
-                                ({{ round(($demografiLaki / $totalFilter) * 100) }}%)</span>
-                        </h4>
-                        <div class="progress mb-4">
-                            <div class="progress-bar bg-primary" role="progressbar"
-                                style="width: {{ ($demografiLaki / $totalFilter) * 100 }}%">
-                            </div>
-                        </div>
-
-                        {{-- Info Persentase Perempuan --}}
-                        <h4 class="small font-weight-bold">
-                            Perempuan
-                            <span class="float-right">{{ $demografiPerempuan }} Jiwa
-                                ({{ round(($demografiPerempuan / $totalFilter) * 100) }}%)</span>
-                        </h4>
-                        <div class="progress mb-4">
-                            <div class="progress-bar bg-danger" role="progressbar"
-                                style="width: {{ ($demografiPerempuan / $totalFilter) * 100 }}%">
-                            </div>
-                        </div>
-
-                        <div class="text-center small mt-4 text-muted">
-                            Total Data: <strong>{{ $totalFilter }}</strong> Penduduk pada kategori ini.
-                        </div>
-                    @else
-                        <div class="text-center py-5 text-muted">
-                            <i class="fas fa-filter fa-2x mb-3"></i><br>
-                            Tidak ada data penduduk kelahiran tahun <strong>{{ request('filter_tahun') }}</strong>.
-                        </div>
-                    @endif
+        <!-- Surat Baru -->
+        <a href="{{ route('ajuan-surat.index') }}" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+             <div class="relative z-10">
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Surat Baru</p>
+                 <div class="flex items-baseline gap-2">
+                     <span class="text-3xl font-bold text-slate-800 group-hover:text-amber-500 transition-colors">{{ number_format($ajuanBaru) }}</span>
+                    <span class="text-slate-400 text-sm">Permintaan</span>
                 </div>
             </div>
+            <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <i class="fas fa-inbox text-6xl text-amber-500 transform translate-x-2 -translate-y-2"></i>
+            </div>
+        </a>
 
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-bolt me-2"></i> Akses Cepat</h6>
-                </div>
-                <div class="card-body">
-                    <a href="{{ route('warga.create') }}"
-                        class="btn btn-success btn-icon-split btn-block mb-2 align-items-start justify-content-start">
-                        <span class="icon text-white-50"><i class="fas fa-user-plus"></i></span>
-                        <span class="text text-left">Tambah Penduduk Baru</span>
-                    </a>
-                    <a href="{{ route('kk.create') }}"
-                        class="btn btn-info btn-icon-split btn-block mb-2 align-items-start justify-content-start">
-                        <span class="icon text-white-50"><i class="fas fa-users"></i></span>
-                        <span class="text text-left">Tambah Data KK</span>
-                    </a>
-                    <a href="{{ route('jenis-surat.index') }}"
-                        class="btn btn-secondary btn-icon-split btn-block align-items-start justify-content-start">
-                        <span class="icon text-white-50"><i class="fas fa-file-word"></i></span>
-                        <span class="text text-left">Kelola Data Surat</span>
-                    </a>
+        <!-- Surat Selesai -->
+        <a href="{{ route('ajuan-surat.arsip') }}" class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+             <div class="relative z-10">
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Surat Selesai</p>
+                <div class="flex items-baseline gap-2">
+                     <span class="text-3xl font-bold text-slate-800 group-hover:text-cyan-600 transition-colors">{{ number_format($suratSelesai) }}</span>
+                    <span class="text-slate-400 text-sm">Arsip</span>
                 </div>
             </div>
-
-        </div>
+             <div class="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <i class="fas fa-archive text-6xl text-cyan-600 transform translate-x-2 -translate-y-2"></i>
+            </div>
+        </a>
     </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Recent Activity Table -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-50 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800">Ajuan Masuk Terakhir</h3>
+                <a href="{{ route('ajuan-surat.index') }}" class="text-sm text-indigo-600 font-medium hover:underline">Lihat Semua</a>
+            </div>
+            
+            <div class="flex-1 overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider text-xs border-b border-slate-100">
+                        <tr>
+                            <th class="px-5 py-3 font-semibold">Warga</th>
+                            <th class="px-5 py-3 font-semibold">Jenis Surat</th>
+                            <th class="px-5 py-3 font-semibold text-center">Status</th>
+                            <th class="px-5 py-3 font-semibold text-right">Waktu</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        @forelse($latestAjuan as $ajuan)
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-5 py-3">
+                                <span class="font-bold text-slate-900 block">{{ $ajuan->warga->nama_lengkap ?? 'Tanpa Nama' }}</span>
+                            </td>
+                            <td class="px-5 py-3 text-slate-500">
+                                {{ $ajuan->jenisSurat->nama_surat ?? '-' }}
+                            </td>
+                            <td class="px-5 py-3 text-center">
+                                @if($ajuan->status == 'BARU')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700">Baru</span>
+                                @elseif($ajuan->status == 'MENUNGGU_TTD')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">Ttd</span>
+                                @elseif($ajuan->status == 'SELESAI')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Selesai</span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">Ditolak</span>
+                                @endif
+                            </td>
+                            <td class="px-5 py-3 text-right text-slate-400 text-xs whitespace-nowrap">
+                                {{ \Carbon\Carbon::parse($ajuan->tanggal_ajuan)->diffForHumans() }}
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="px-5 py-8 text-center text-slate-400">
+                                Belum ada pengajuan surat.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Demographics Card -->
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-50 flex items-center justify-between">
+                <div>
+                     <h3 class="font-bold text-slate-800">Demografi</h3>
+                     <p class="text-xs text-slate-500 mt-0.5">Filter berdasarkan tahun kelahiran</p>
+                </div>
+            </div>
+            
+            <div class="p-5 border-b border-slate-50 bg-slate-50/50">
+                 <form action="{{ route('admin.dashboard') }}" method="GET">
+                    <select name="filter_tahun" class="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 outline-none transition-shadow" onchange="this.form.submit()">
+                        <option value="">- Semua Umur -</option>
+                        @foreach($tahunLahirList as $tahun)
+                            <option value="{{ $tahun }}" {{ request('filter_tahun') == $tahun ? 'selected' : '' }}>
+                                Lahir Tahun {{ $tahun }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+
+            <div class="p-6 flex-1 flex flex-col justify-center space-y-6">
+                @if($totalFilter > 0)
+                    <!-- Male -->
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                <i class="fas fa-mars text-blue-500"></i> Laki-laki
+                            </span>
+                             <span class="text-xs font-mono text-slate-400">{{ $demografiLaki }} ({{ round(($demografiLaki / $totalFilter) * 100) }}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5">
+                            <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: {{ ($demografiLaki / $totalFilter) * 100 }}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Female -->
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
+                             <span class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                <i class="fas fa-venus text-pink-500"></i> Perempuan
+                            </span>
+                             <span class="text-xs font-mono text-slate-400">{{ $demografiPerempuan }} ({{ round(($demografiPerempuan / $totalFilter) * 100) }}%)</span>
+                        </div>
+                         <div class="w-full bg-slate-100 rounded-full h-2.5">
+                            <div class="bg-pink-500 h-2.5 rounded-full transition-all duration-500" style="width: {{ ($demografiPerempuan / $totalFilter) * 100 }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+                        <span class="inline-block bg-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-medium">
+                            Total: {{ number_format($totalFilter) }} Jiwa
+                        </span>
+                    </div>
+                @else
+                    <div class="text-center py-4 text-slate-400">
+                        <i class="fas fa-filter text-4xl mb-3 opacity-20"></i>
+                        <p class="text-sm">Tidak ada data untuk tahun {{ request('filter_tahun') }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Quick Info -->
+    <div class="bg-indigo-900 rounded-2xl p-6 text-white relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex items-start gap-4">
+                 <div class="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl flex-shrink-0 border border-white/20">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div>
+                   <h3 class="font-bold text-lg mb-1">Informasi Sistem</h3>
+                   <p class="text-indigo-200 text-sm max-w-xl leading-relaxed">
+                       Sistem Pelayanan Administrasi Desa (SIPANDA) Desa Panggulo.
+                       Pastikan untuk selalu meninjau data sebelum melakukan konfirmasi persetujuan surat.
+                   </p>
+                </div>
+            </div>
+             <div class="text-xs text-indigo-300 font-mono bg-black/20 px-3 py-2 rounded-lg">
+                <i class="fas fa-server mr-2"></i>v1.0.0 Stable
+            </div>
+        </div>
+        <!-- Decorative bg -->
+        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
+    </div>
+
+</div>
 @endsection

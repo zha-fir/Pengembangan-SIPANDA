@@ -76,7 +76,9 @@
             <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 overflow-x-hidden">
                 @php
                     $role = Auth::user()->role;
-                    $prefix = $role == 'kades' ? 'kades' : 'kadus';
+                    if ($role == 'kades') $prefix = 'kades';
+                    elseif ($role == 'kadus') $prefix = 'kadus';
+                    else $prefix = 'admin';
                 @endphp
 
                 <!-- Dashboard -->
@@ -90,7 +92,8 @@
                     <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Dashboard</span>
                 </a>
 
-                <!-- Approval (New) -->
+                <!-- Approval (Hidden for Admin) -->
+                @if($role != 'admin')
                 <a href="{{ route($prefix.'.approval.index') }}" 
                    title="Persetujuan Surat"
                    class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
@@ -100,12 +103,95 @@
                    </div>
                     <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Persetujuan Surat</span>
                 </a>
+                @endif
 
                 <div class="pt-4 pb-2 sidebar-text transition-opacity duration-300">
                     <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Menu Utama</p>
                 </div>
 
-                @if($role == 'kades')
+                @if($role == 'admin')
+                    <!-- ADMIN MENU -->
+                    
+                    <!-- MANAJEMEN DATA -->
+                    <div class="pt-4 pb-2 sidebar-text transition-opacity duration-300">
+                        <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Manajemen Data</p>
+                    </div>
+
+                    <a href="{{ route('dusun.index') }}" 
+                       title="Data Dusun"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/dusun*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-map-marked-alt text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Data Dusun</span>
+                    </a>
+
+                    <a href="{{ route('kk.index') }}" 
+                       title="Kartu Keluarga"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/kk*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-home text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Kartu Keluarga</span>
+                    </a>
+
+                    <a href="{{ route('warga.index') }}" 
+                       title="Data Penduduk"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/warga*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-users text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Data Penduduk</span>
+                    </a>
+
+                    <a href="{{ route('pejabat-desa.index') }}" 
+                       title="Perangkat Desa"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/pejabat-desa*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-user-tie text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Perangkat Desa</span>
+                    </a>
+
+                     <!-- LAYANAN SURAT -->
+                    <div class="pt-4 pb-2 sidebar-text transition-opacity duration-300">
+                        <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Layanan Surat</p>
+                    </div>
+
+                    <a href="{{ route('jenis-surat.index') }}" 
+                       title="Master Jenis Surat"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/jenis-surat*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-mail-bulk text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Master Jenis Surat</span>
+                    </a>
+
+                    <a href="{{ route('ajuan-surat.index') }}" 
+                       title="Permohonan Masuk"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/ajuan-surat*') && !Request::is('admin/arsip-surat*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-inbox text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Permohonan Masuk</span>
+                    </a>
+
+                     <a href="{{ route('ajuan-surat.arsip') }}" 
+                       title="Arsip Surat"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/arsip-surat*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-archive text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Arsip Surat</span>
+                    </a>
+
+                     <!-- PENGATURAN -->
+                    <div class="pt-4 pb-2 sidebar-text transition-opacity duration-300">
+                        <p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Pengaturan</p>
+                    </div>
+
+                    <a href="{{ route('users.index') }}" 
+                       title="Manajemen Pengguna"
+                       class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
+                       {{ Request::is('admin/users*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}">
+                        <div class="flex-shrink-0 w-6 text-center"><i class="fas fa-user-cog text-slate-400"></i></div>
+                        <span class="sidebar-text whitespace-nowrap transition-opacity duration-300">Manajemen Pengguna</span>
+                    </a>
+
+                @elseif($role == 'kades')
                     <a href="{{ route('kades.monitoring.index') }}" 
                        title="Monitoring Surat"
                        class="group flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
@@ -187,6 +273,8 @@
                 </a>
 
                 <!-- Approval (Center Prominent) -->
+                <!-- Approval (Center Prominent) - Hidden for Admin -->
+                 @if($role != 'admin')
                  <a href="{{ route($prefix.'.approval.index') }}" class="flex flex-col items-center justify-center w-full h-full space-y-1 {{ Request::is($prefix.'/approval*') ? 'text-indigo-600' : 'text-slate-400' }}">
                     <div class="relative">
                          <i class="fas fa-file-signature text-xl mb-1"></i>
@@ -194,6 +282,7 @@
                     </div>
                     <span class="text-[10px] font-medium">Setujui</span>
                 </a>
+                @endif
 
                 <!-- Menu (More) -->
                 <button type="button" onclick="toggleMobileMenu()" class="flex flex-col items-center justify-center w-full h-full space-y-1 text-slate-400">
@@ -222,7 +311,42 @@
 
                 <!-- Menus -->
                 <div class="grid gap-2">
-                    @if($role == 'kades')
+                    @if($role == 'admin')
+                        <!-- DATA ADMIN -->
+                        <div class="px-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Manajemen Data</div>
+                        
+                        <a href="{{ route('dusun.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-map-marked-alt w-6 text-center text-indigo-500"></i> <span class="font-medium">Data Dusun</span>
+                        </a>
+                        <a href="{{ route('kk.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-home w-6 text-center text-indigo-500"></i> <span class="font-medium">Kartu Keluarga</span>
+                        </a>
+                        <a href="{{ route('warga.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-users w-6 text-center text-indigo-500"></i> <span class="font-medium">Data Penduduk</span>
+                        </a>
+                        <a href="{{ route('pejabat-desa.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-user-tie w-6 text-center text-indigo-500"></i> <span class="font-medium">Perangkat Desa</span>
+                        </a>
+                        
+                        <div class="mt-2 px-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Layanan Surat</div>
+                        
+                        <a href="{{ route('jenis-surat.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-mail-bulk w-6 text-center text-indigo-500"></i> <span class="font-medium">Jenis Surat</span>
+                        </a>
+                        <a href="{{ route('ajuan-surat.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-inbox w-6 text-center text-indigo-500"></i> <span class="font-medium">Permohonan</span>
+                        </a>
+                        <a href="{{ route('ajuan-surat.arsip') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-archive w-6 text-center text-indigo-500"></i> <span class="font-medium">Arsip Surat</span>
+                        </a>
+
+                         <div class="mt-2 px-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Sistem</div>
+
+                        <a href="{{ route('users.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
+                            <i class="fas fa-user-cog w-6 text-center text-indigo-500"></i> <span class="font-medium">Pengguna</span>
+                        </a>
+
+                    @elseif($role == 'kades')
                          <a href="{{ route('kades.monitoring.index') }}" class="p-3 flex items-center gap-3 hover:bg-slate-50 rounded-xl text-slate-600">
                             <i class="fas fa-eye w-6 text-center text-indigo-500"></i> <span class="font-medium">Monitoring Surat</span>
                         </a>

@@ -1,77 +1,102 @@
-@extends('layouts.admin')
+@extends('layouts.modern')
 
-@section('title', 'Tambah Data KK')
+@section('title', 'Tambah Kartu Keluarga')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Form Tambah Kartu Keluarga</h6>
-        </div>
-        <div class="card-body">
+<div class="max-w-3xl mx-auto space-y-6">
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form action="{{ route('kk.store') }}" method="POST">
-                @csrf
-
-                <div class="form-group">
-                    <label for="no_kk">Nomor KK (16 Digit)</label>
-                    <input type="text" class="form-control" id="no_kk" name="no_kk" value="{{ old('no_kk') }}">
-                </div>
-
-                {{-- <div class="form-group">
-                    <label for="nama_kepala_keluarga">Nama Kepala Keluarga</label>
-                    <input type="text" class="form-control" id="nama_kepala_keluarga" name="nama_kepala_keluarga"
-                        value="{{ old('nama_kepala_keluarga') }}">
-                </div> --}}
-
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="form-group">
-                            <label for="id_dusun">Pilih Dusun</label>
-                            {{-- Ini adalah DROPDOWN --}}
-                            <select class="form-control" id="id_dusun" name="id_dusun">
-                                <option value="">-- Pilih Dusun --</option>
-                                {{-- Loop data $dusunList yang dikirim dari Controller --}}
-                                @foreach ($dusunList as $dusun)
-                                    <option value="{{ $dusun->id_dusun }}" {{ old('id_dusun') == $dusun->id_dusun ? 'selected' : '' }}>
-                                        {{ $dusun->nama_dusun }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="rt">RT</label>
-                            <input type="text" class="form-control" id="rt" name="rt" value="{{ old('rt') }}">
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="rw">RW</label>
-                            <input type="text" class="form-control" id="rw" name="rw" value="{{ old('rw') }}">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="alamat_kk">Alamat Lengkap (Sesuai KK)</label>
-                    <textarea class="form-control" id="alamat_kk" name="alamat_kk"
-                        rows="3">{{ old('alamat_kk') }}</textarea>
-                </div>
-
-                <a href="{{ route('kk.index') }}" class="btn btn-secondary">Batal</a>
-                <button typeD="submit" class="btn btn-primary">Simpan</button>
-            </form>
-        </div>
+    <!-- Header -->
+    <div>
+        <a href="{{ route('kk.index') }}" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-indigo-600 mb-2 transition-colors">
+            <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+        </a>
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Tambah Kartu Keluarga Baru</h1>
+        <p class="text-slate-500 text-sm mt-1">Masukkan data Nomor Kartu Keluarga dan alamat.</p>
     </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+        
+        @if ($errors->any())
+            <div class="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 text-sm mb-6">
+                <ul class="list-disc list-inside space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('kk.store') }}" method="POST" class="space-y-6">
+            @csrf
+
+            <!-- No KK -->
+            <div>
+                 <label for="no_kk" class="block text-sm font-semibold text-slate-700 mb-2">Nomor KK (16 Digit)</label>
+                <div class="relative">
+                    <input type="text" id="no_kk" name="no_kk" value="{{ old('no_kk') }}" maxlength="16" required
+                           class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-mono placeholder:text-slate-400"
+                           placeholder="3500000000000000">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Dusun -->
+                <div class="md:col-span-1">
+                     <label for="id_dusun" class="block text-sm font-semibold text-slate-700 mb-2">Wilayah Dusun</label>
+                     <div class="relative">
+                        <select name="id_dusun" id="id_dusun" required
+                                class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none appearance-none transition-all text-slate-700">
+                             <option value="">-- Pilih Dusun --</option>
+                             @foreach ($dusunList as $dusun)
+                                <option value="{{ $dusun->id_dusun }}" {{ old('id_dusun') == $dusun->id_dusun ? 'selected' : '' }}>
+                                    {{ $dusun->nama_dusun }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500"><i class="fas fa-chevron-down text-xs"></i></div>
+                     </div>
+                </div>
+
+                <!-- RT -->
+                <div>
+                     <label for="rt" class="block text-sm font-semibold text-slate-700 mb-2">RT</label>
+                    <input type="number" id="rt" name="rt" value="{{ old('rt') }}" required
+                           class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                           placeholder="001">
+                </div>
+
+                <!-- RW -->
+                <div>
+                     <label for="rw" class="block text-sm font-semibold text-slate-700 mb-2">RW</label>
+                    <input type="number" id="rw" name="rw" value="{{ old('rw') }}" required
+                           class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                           placeholder="001">
+                </div>
+            </div>
+
+             <!-- Alamat -->
+            <div>
+                 <label for="alamat_kk" class="block text-sm font-semibold text-slate-700 mb-2">Alamat Lengkap</label>
+                <textarea id="alamat_kk" name="alamat_kk" rows="3" required
+                          class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                          placeholder="Jalan, Gang, Nomor Rumah...">{{ old('alamat_kk') }}</textarea>
+            </div>
+
+             <!-- Buttons -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                 <a href="{{ route('kk.index') }}" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-colors">
+                    Batal
+                </a>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm shadow-indigo-200 transition-colors">
+                    <i class="fas fa-save mr-2"></i> Simpan Data
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
 @endsection

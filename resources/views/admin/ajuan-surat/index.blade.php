@@ -1,256 +1,350 @@
-@extends('layouts.admin')
+@extends('layouts.modern')
+
 @section('title', 'Pengajuan Surat Masuk')
+
 @section('content')
+<div class="space-y-6">
 
-    {{-- Tampilkan Pesan Sukses/Error --}}
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Pengajuan Masuk</h1>
+            <p class="text-slate-500 text-sm mt-1">Daftar permohonan surat yang perlu ditindaklanjuti.</p>
+        </div>
+         <div>
+            <span class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl text-sm font-bold border border-indigo-100">
+                <i class="fas fa-inbox"></i> {{ $ajuanList->count() }} Permohonan Baru
+            </span>
+        </div>
+    </div>
+
+    {{-- Alerts --}}
     @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div> @endif
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl flex items-center gap-3">
+             <i class="fas fa-check-circle text-xl"></i>
+             <p class="font-medium">{{ session('success') }}</p>
+        </div>
+    @endif
     @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div> @endif
-
-    {{-- Tampilkan Error Validasi (jika modal gagal) --}}
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            Gagal memproses ajuan. Pastikan semua field terisi.
-            <ul>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3">
+             <i class="fas fa-exclamation-circle text-xl"></i>
+             <p class="font-medium">{{ session('error') }}</p>
+        </div>
+    @endif
+     @if ($errors->any())
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+             <p class="font-bold mb-1">Gagal memproses ajuan:</p>
+            <ul class="list-disc list-inside text-sm">
                 @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
             </ul>
         </div>
     @endif
 
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Pengajuan (Status: BARU)</h6>
+    <!-- Table Content -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                 <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider text-xs border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-4 font-bold">Tanggal</th>
+                        <th class="px-6 py-4 font-bold">Pemohon</th>
+                        <th class="px-6 py-4 font-bold">Jenis Surat</th>
+                        <th class="px-6 py-4 font-bold">Keperluan</th>
+                        <th class="px-6 py-4 font-bold text-center w-32">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse ($ajuanList as $ajuan)
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 text-slate-500 font-mono">
+                            <div class="flex items-center gap-2">
+                                <i class="far fa-calendar-alt"></i> {{ $ajuan->tanggal_ajuan }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-9 w-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100">
+                                    <i class="fas fa-user text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800 text-sm">{{ optional($ajuan->warga)->nama_lengkap ?? 'N/A' }}</p>
+                                    <p class="text-xs text-slate-500 font-mono">{{ optional($ajuan->warga)->nik ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-indigo-700">{{ optional($ajuan->jenisSurat)->nama_surat ?? 'N/A' }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                             <p class="truncate max-w-[200px]" title="{{ $ajuan->keperluan }}">{{ $ajuan->keperluan }}</p>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button type="button" 
+                                    class="open-confirm-modal p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors"
+                                    data-id="{{ $ajuan->id_ajuan }}"
+                                    data-nama="{{ optional($ajuan->warga)->nama_lengkap ?? '' }}"
+                                    data-nik="{{ optional($ajuan->warga)->nik ?? '' }}"
+                                    data-jenis-surat="{{ optional($ajuan->jenisSurat)->nama_surat ?? '' }}"
+                                    data-keperluan="{{ $ajuan->keperluan }}"
+                                    data-tambahan="{{ $ajuan->data_tambahan }}"
+                                    title="Setujui">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button type="button" 
+                                    class="open-reject-modal p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition-colors"
+                                    data-id="{{ $ajuan->id_ajuan }}"
+                                    title="Tolak">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                             <div class="flex flex-col items-center justify-center">
+                                <i class="fas fa-inbox text-4xl mb-3 opacity-20"></i>
+                                <p>Tidak ada pengajuan surat baru.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Tanggal Pengajuan</th>
-                            <th>Pemohon (NIK)</th>
-                            <th>Jenis Surat</th>
-                            <th>Keperluan</th>
-                            <th class="text-center" width="15%">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($ajuanList as $ajuan)
-                            <tr>
-                                <td class="align-middle">
-                                    <i class="far fa-calendar-alt text-gray-400 mr-2"></i>
-                                    {{ $ajuan->tanggal_ajuan }}
-                                </td>
-                                <td class="align-middle">
-                                    <div class="d-flex align-items-center">
-                                        <div class="mr-2">
-                                            <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                                                <i class="fas fa-user"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span class="font-weight-bold text-dark">{{ optional($ajuan->warga)->nama_lengkap ?? 'N/A' }}</span>
-                                            <br>
-                                            <small class="text-muted">NIK: {{ optional($ajuan->warga)->nik ?? 'N/A' }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="align-middle">
-                                    <span class="font-weight-bold text-primary">{{ optional($ajuan->jenisSurat)->nama_surat ?? 'N/A' }}</span>
-                                </td>
-                                <td class="align-middle">{{ $ajuan->keperluan }}</td>
-                                <td class="align-middle text-center">
-                                    <div class="d-flex justify-content-center">
-                                        {{-- Tombol Pemicu Modal Konfirmasi --}}
-                                        <button type="button" class="btn btn-success btn-circle btn-sm mr-1" data-toggle="modal"
-                                            data-target="#konfirmasiModal" data-id="{{ $ajuan->id_ajuan }}"
-                                            data-nama="{{ optional($ajuan->warga)->nama_lengkap ?? '' }}"
-                                            data-nik="{{ optional($ajuan->warga)->nik ?? '' }}"
-                                            data-jenis-surat="{{ optional($ajuan->jenisSurat)->nama_surat ?? '' }}"
-                                            data-keperluan="{{ $ajuan->keperluan }}" data-tambahan="{{ $ajuan->data_tambahan }}"
-                                            title="Konfirmasi">
-                                            <i class="fas fa-check"></i>
-                                        </button>
 
-                                        {{-- Tombol Pemicu Modal Tolak --}}
-                                        <button type="button" class="btn btn-danger btn-circle btn-sm" data-toggle="modal"
-                                            data-target="#tolakModal" data-id="{{ $ajuan->id_ajuan }}"
-                                            title="Tolak">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-4">
-                                    <div class="text-gray-500 mb-2"><i class="fas fa-inbox fa-2x"></i></div>
-                                    <div>Belum ada ajuan surat baru.</div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="konfirmasiModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <form id="formKonfirmasi" action="" method="POST"> {{-- Action diisi JS --}}
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title">Konfirmasi Surat Keterangan</h5>
-                        <button class="close" type="button" data-dismiss="modal"><span>×</span></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Anda akan mengonfirmasi ajuan surat untuk:</p>
-                        <ul>
-                            <li><strong>Nama:</strong> <span id="modalNama"></span></li>
-                            <li><strong>NIK:</strong> <span id="modalNik"></span></li>
-                            <li><strong>Jenis Surat:</strong> <span id="modalJenisSurat"></span></li>
-                            <li><strong>Keperluan:</strong> <span id="modalKeperluan"></span></li>
-                        </ul>
-
-                        {{-- AREA BARU: DATA TAMBAHAN (Default disembunyikan) --}}
-                        <div id="areaDataTambahan" class="alert alert-warning d-none">
-                            <h6 class="font-weight-bold"><i class="fas fa-info-circle"></i> Data Input Warga:</h6>
-                            <ul id="listDataTambahan" class="mb-0 pl-3">
-                                {{-- List akan diisi otomatis oleh JavaScript --}}
-                            </ul>
+        <!-- Mobile View -->
+        <div class="md:hidden divide-y divide-slate-100">
+             @forelse ($ajuanList as $ajuan)
+             <div class="p-4 space-y-3">
+                <div class="flex justify-between items-start">
+                     <div class="flex items-center gap-3">
+                         <div class="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100">
+                            <i class="fas fa-user"></i>
                         </div>
-
-                        <hr>
-                        <p>Silakan isi detail surat resmi di bawah ini:</p>
-                        <div class="form-group">
-                            <label for="nomor_surat">No. Surat (Resmi)</label>
-                            <input type="text" class="form-control" id="nomor_surat" name="nomor_surat" required
-                                placeholder="Contoh: PLB/2025/XI/123">
-                        </div>
-                        {{-- Dropdown Pejabat 1 (Yang sudah ada) --}}
-                        <div class="form-group">
-                            <label for="id_pejabat_desa">Pejabat Penandatangan 1 (Utama/Kanan)</label>
-                            <select class="form-control" id="id_pejabat_desa" name="id_pejabat_desa" required>
-                                <option value="">-- PILIH PEJABAT 1 --</option>
-                                @foreach ($pejabatList as $pejabat)
-                                    <option value="{{ $pejabat->id_pejabat_desa }}">
-                                        {{ $pejabat->nama_pejabat }} ({{ $pejabat->jabatan }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Dropdown Pejabat 2 (BARU) --}}
-                        <div class="form-group">
-                            <label for="id_pejabat_desa_2">Pejabat Penandatangan 2 (Opsional/Kiri)</label>
-                            <select class="form-control" id="id_pejabat_desa_2" name="id_pejabat_desa_2">
-                                <option value="">-- KOSONGKAN JIKA TIDAK PERLU --</option>
-                                @foreach ($pejabatList as $pejabat)
-                                    <option value="{{ $pejabat->id_pejabat_desa }}">
-                                        {{ $pejabat->nama_pejabat }} ({{ $pejabat->jabatan }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <small class="text-muted">Biasanya untuk Kepala Dusun atau mengetahui Camat.</small>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm">{{ optional($ajuan->warga)->nama_lengkap ?? 'N/A' }}</h3>
+                            <p class="text-xs text-slate-500 font-mono">{{ optional($ajuan->warga)->nik ?? 'N/A' }}</p>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-success">Konfirmasi & Simpan ke Arsip</button>
+                     <span class="text-xs font-mono text-slate-400">{{ $ajuan->tanggal_ajuan }}</span>
+                </div>
+                
+                 <div class="bg-indigo-50 p-3 rounded-lg text-sm space-y-2 border border-indigo-100">
+                     <div class="flex flex-col">
+                        <span class="text-xs text-indigo-400 font-bold uppercase">Jenis Surat</span>
+                        <span class="text-indigo-800 font-medium">{{ optional($ajuan->jenisSurat)->nama_surat ?? 'N/A' }}</span>
                     </div>
-                </form>
-            </div>
+                     <div class="flex flex-col pt-2 border-t border-indigo-100">
+                        <span class="text-xs text-indigo-400 font-bold uppercase">Keperluan</span>
+                        <span class="text-indigo-800">{{ $ajuan->keperluan }}</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-50">
+                     <button type="button" 
+                        class="open-reject-modal flex-1 py-2 bg-rose-50 text-rose-700 text-center rounded-lg text-sm font-medium hover:bg-rose-100"
+                        data-id="{{ $ajuan->id_ajuan }}">
+                        Tolak
+                    </button>
+                    <button type="button" 
+                        class="open-confirm-modal flex-1 py-2 bg-emerald-50 text-emerald-700 text-center rounded-lg text-sm font-medium hover:bg-emerald-100"
+                        data-id="{{ $ajuan->id_ajuan }}"
+                        data-nama="{{ optional($ajuan->warga)->nama_lengkap ?? '' }}"
+                        data-nik="{{ optional($ajuan->warga)->nik ?? '' }}"
+                        data-jenis-surat="{{ optional($ajuan->jenisSurat)->nama_surat ?? '' }}"
+                        data-keperluan="{{ $ajuan->keperluan }}"
+                        data-tambahan="{{ $ajuan->data_tambahan }}">
+                        Setujui
+                    </button>
+                </div>
+             </div>
+             @empty
+             <div class="p-8 text-center text-slate-400">
+                 <p>Tidak ada pengajuan surat baru.</p>
+             </div>
+             @endforelse
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="tolakModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="formTolak" action="" method="POST"> {{-- Action diisi JS --}}
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title">Tolak Ajuan Surat</h5>
-                        <button class="close" type="button" data-dismiss="modal"><span>×</span></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Anda yakin ingin menolak ajuan ini? Berikan alasan penolakan (wajib).</p>
-                        <div class="form-group">
-                            <label for="catatan_penolakan">Alasan Penolakan</label>
-                            <textarea class="form-control" name="catatan_penolakan" rows="3" required></textarea>
+<!-- Modal Konfirmasi (Approval) -->
+<div id="konfirmasiModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('konfirmasiModal')"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <form id="formKonfirmasi" action="" method="POST">
+                @csrf
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                     <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-check text-emerald-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900" id="modal-title">Konfirmasi Surat</h3>
+                            
+                            <div class="mt-4 bg-slate-50 rounded-xl p-4 text-sm text-slate-600 space-y-1">
+                                <p><span class="font-bold w-24 inline-block">Nama:</span> <span id="modalNama"></span></p>
+                                <p><span class="font-bold w-24 inline-block">NIK:</span> <span id="modalNik"></span></p>
+                                <p><span class="font-bold w-24 inline-block">Jenis:</span> <span id="modalJenisSurat"></span></p>
+                            </div>
+
+                             <!-- Data Tambahan -->
+                            <div id="areaDataTambahan" class="hidden mt-3 bg-amber-50 border border-amber-100 rounded-xl p-3 text-sm">
+                                <h6 class="font-bold text-amber-800 mb-2 flex items-center gap-1"><i class="fas fa-info-circle"></i> Input Tambahan Warga:</h6>
+                                <ul id="listDataTambahan" class="list-disc list-inside text-amber-900 pl-1 space-y-1"></ul>
+                            </div>
+
+                            <div class="mt-6 space-y-4">
+                                <div>
+                                    <label for="nomor_surat" class="block text-sm font-bold text-slate-700 mb-1">No. Surat (Resmi)</label>
+                                    <input type="text" name="nomor_surat" id="nomor_surat" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Contoh: PLB/2025/XI/123" required>
+                                </div>
+                                <div>
+                                    <label for="id_pejabat_desa" class="block text-sm font-bold text-slate-700 mb-1">Pejabat Penandatangan 1</label>
+                                    <select name="id_pejabat_desa" id="id_pejabat_desa" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" required>
+                                        <option value="">-- Pilih Pejabat --</option>
+                                        @foreach ($pejabatList as $pejabat)
+                                            <option value="{{ $pejabat->id_pejabat_desa }}">
+                                                {{ $pejabat->nama_pejabat }} ({{ $pejabat->jabatan }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="id_pejabat_desa_2" class="block text-sm font-bold text-slate-700 mb-1">Pejabat Penandatangan 2 (Opsional)</label>
+                                    <select name="id_pejabat_desa_2" id="id_pejabat_desa_2" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                                        <option value="">-- Kosongkan jika tidak perlu --</option>
+                                        @foreach ($pejabatList as $pejabat)
+                                            <option value="{{ $pejabat->id_pejabat_desa }}">
+                                                {{ $pejabat->nama_pejabat }} ({{ $pejabat->jabatan }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-danger">Ya, Tolak Ajuan</button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Konfirmasi & Simpan
+                    </button>
+                    <button type="button" onclick="closeModal('konfirmasiModal')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Batal
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-@endsection
+</div>
 
-@push('scripts')
-    {{-- Script untuk mengisi data-data ke Modal --}}
-    <script>
-        $(document).ready(function () {
-            // Script untuk Modal Konfirmasi
-            // Script untuk Modal Konfirmasi
-            $('#konfirmasiModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var ajuanId = button.data('id');
-                var nama = button.data('nama');
-                var nik = button.data('nik');
-                var keperluan = button.data('keperluan');
-                var jenisSurat = button.data('jenis-surat');
+<!-- Modal Tolak (Reject) -->
+<div id="tolakModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal('tolakModal')"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <form id="formTolak" action="" method="POST">
+                @csrf
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                     <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-rose-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation-triangle text-rose-600"></i>
+                        </div>
+                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-slate-900" id="modal-title">Tolak Pengajuan</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-slate-500">
+                                    Apakah Anda yakin ingin menolak pengajuan ini? Mohon berikan alasan penolakan agar warga dapat memperbaikinya.
+                                </p>
+                            </div>
+                            <div class="mt-4">
+                                <label class="block text-sm font-bold text-slate-700 mb-1">Alasan Penolakan</label>
+                                <textarea name="catatan_penolakan" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none" required placeholder="Contoh: Data kurang lengkap..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-rose-600 text-base font-medium text-white hover:bg-rose-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Tolak Pengajuan
+                    </button>
+                    <button type="button" onclick="closeModal('tolakModal')" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-                // AMBIL DATA TAMBAHAN (JSON)
-                var dataTambahan = button.data('tambahan');
+<script>
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
 
-                var modal = $(this);
-                var actionUrl = "{{ url('admin/ajuan-surat') }}/" + ajuanId + "/konfirmasi";
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
 
-                modal.find('#formKonfirmasi').attr('action', actionUrl);
-                modal.find('#modalNama').text(nama);
-                modal.find('#modalNik').text(nik);
-                modal.find('#modalKeperluan').text(keperluan);
-                modal.find('#modalJenisSurat').text(jenisSurat);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Open Confirm Modal
+        const confirmButtons = document.querySelectorAll('.open-confirm-modal');
+        confirmButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const nama = this.dataset.nama;
+                const nik = this.dataset.nik;
+                const jenisSurat = this.dataset.jenisSurat;
+                const dataTambahan = JSON.parse(this.dataset.tambahan || '{}');
 
-                // --- LOGIKA MENAMPILKAN DATA TAMBAHAN ---
-                var listArea = modal.find('#listDataTambahan');
-                var container = modal.find('#areaDataTambahan');
+                // Set Action URL
+                document.getElementById('formKonfirmasi').action = "{{ url('admin/ajuan-surat') }}/" + id + "/konfirmasi";
 
-                // Kosongkan list lama
-                listArea.empty();
+                // Set modal data
+                document.getElementById('modalNama').textContent = nama;
+                document.getElementById('modalNik').textContent = nik;
+                document.getElementById('modalJenisSurat').textContent = jenisSurat;
 
-                if (dataTambahan) {
-                    // Jika ada data tambahan, Munculkan kotaknya
-                    container.removeClass('d-none');
+                // Handle Data Tambahan
+                const areaTambahan = document.getElementById('areaDataTambahan');
+                const listTambahan = document.getElementById('listDataTambahan');
+                listTambahan.innerHTML = '';
 
-                    // Loop setiap data (key: value)
-                    $.each(dataTambahan, function (key, value) {
-                        // Rapikan nama Key (misal: "bidang_usaha" jadi "Bidang Usaha")
-                        var label = key.replace(/_/g, ' ').replace(/\b\w/g, function (l) { return l.toUpperCase() });
-
-                        // Masukkan ke list
-                        listArea.append('<li><strong>' + label + ':</strong> ' + value + '</li>');
-                    });
+                if (Object.keys(dataTambahan).length > 0) {
+                    areaTambahan.classList.remove('hidden');
+                    for (const [key, value] of Object.entries(dataTambahan)) {
+                        // Format key text (e.g. bidang_usaha -> Bidang Usaha)
+                        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        const li = document.createElement('li');
+                        li.innerHTML = `<strong>${label}:</strong> ${value}`;
+                        listTambahan.appendChild(li);
+                    }
                 } else {
-                    // Jika tidak ada data tambahan, sembunyikan kotaknya
-                    container.addClass('d-none');
+                    areaTambahan.classList.add('hidden');
                 }
-            });
 
-            // Script untuk Modal Tolak
-            $('#tolakModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var ajuanId = button.data('id');
-                var actionUrl = "{{ url('admin/ajuan-surat') }}/" + ajuanId + "/tolak";
-
-                var modal = $(this);
-                modal.find('#formTolak').attr('action', actionUrl);
+                openModal('konfirmasiModal');
             });
         });
-    </script>
-@endpush
+
+        // Handle Open Reject Modal
+        const rejectButtons = document.querySelectorAll('.open-reject-modal');
+        rejectButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                document.getElementById('formTolak').action = "{{ url('admin/ajuan-surat') }}/" + id + "/tolak";
+                openModal('tolakModal');
+            });
+        });
+    });
+</script>
+@endsection

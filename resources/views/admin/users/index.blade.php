@@ -1,98 +1,182 @@
-@extends('layouts.admin')
-@section('title', 'Manajemen Akun Pengguna')
+@extends('layouts.modern')
+
+@section('title', 'Manajemen Pengguna')
+
 @section('content')
+<div class="space-y-6">
 
-    @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div> @endif
-    @if(session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div> @endif
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Pengguna Sistem</h6>
+    <!-- Header & Actions -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Manajemen Pengguna</h1>
+            <p class="text-slate-500 text-sm mt-1">Kelola akun pengguna dan hak akses sistem.</p>
         </div>
-        <div class="card-body">
-            <a href="{{ route('users.create') }}" class="btn btn-primary mb-3 shadow-sm"><i class="fas fa-user-plus mr-1"></i> Tambah Akun</a>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Nama Lengkap</th>
-                            <th>Username</th>
-                            <th class="text-center">Role</th>
-                            <th>Wilayah (Khusus Kadus)</th>
-                            <th class="text-center" width="15%">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($users as $user)
-                            <tr>
-                                <td class="align-middle">
-                                    <div class="d-flex align-items-center">
-                                        <div class="mr-2">
-                                            @php
-                                                $bgClass = 'bg-secondary';
-                                                $icon = 'fas fa-user';
-                                                if($user->role == 'admin') { $bgClass = 'bg-danger'; $icon = 'fas fa-user-cog'; }
-                                                elseif($user->role == 'kades') { $bgClass = 'bg-primary'; $icon = 'fas fa-user-tie'; }
-                                                elseif($user->role == 'kadus') { $bgClass = 'bg-success'; $icon = 'fas fa-user-tag'; }
-                                            @endphp
-                                            <div class="{{ $bgClass }} text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                                                <i class="{{ $icon }}"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span class="font-weight-bold text-dark">{{ $user->nama_lengkap }}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="align-middle">{{ $user->username }}</td>
-                                <td class="align-middle text-center">
-                                    @if($user->role == 'admin') 
-                                        <span class="badge badge-danger px-2 py-1"><i class="fas fa-user-cog mr-1"></i>ADMIN</span>
-                                    @elseif($user->role == 'kades') 
-                                        <span class="badge badge-primary px-2 py-1"><i class="fas fa-user-tie mr-1"></i>KEPALA DESA</span>
-                                    @elseif($user->role == 'kadus') 
-                                        <span class="badge badge-success px-2 py-1"><i class="fas fa-map-marked-alt mr-1"></i>KEPALA DUSUN</span>
-                                    @else 
-                                        <span class="badge badge-secondary px-2 py-1"><i class="fas fa-user mr-1"></i>WARGA</span> 
-                                    @endif
-                                </td>
-                                <td class="align-middle">
-                                    @if($user->dusun)
-                                        <i class="fas fa-map-marker-alt text-danger mr-1"></i> {{ $user->dusun->nama_dusun }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td class="align-middle text-center">
-                                    <div class="d-flex justify-content-center">
-                                        <a href="{{ route('users.edit', $user->id_user) }}" class="btn btn-warning btn-circle btn-sm mr-1" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        @if($user->id_user != Auth::id())
-                                            <form action="{{ route('users.destroy', $user->id_user) }}" method="POST" class="d-inline"
-                                                onsubmit="return confirm('Yakin hapus user ini?');">
-                                                @csrf @method('DELETE')
-                                                <button class="btn btn-danger btn-circle btn-sm" title="Hapus">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-5">
-                                    <div class="text-gray-500 mb-2"><i class="fas fa-users-slash fa-2x"></i></div>
-                                    <div>Belum ada data pengguna.</div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+        <div>
+            <a href="{{ route('users.create') }}" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-indigo-200">
+                <i class="fas fa-plus"></i> Tambah Pengguna
+            </a>
         </div>
     </div>
+
+    {{-- Alerts --}}
+    @if(session('success'))
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl flex items-center gap-3">
+             <i class="fas fa-check-circle text-xl"></i>
+             <p class="font-medium">{{ session('success') }}</p>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3">
+             <i class="fas fa-exclamation-circle text-xl"></i>
+             <p class="font-medium">{{ session('error') }}</p>
+        </div>
+    @endif
+
+    <!-- Table Content -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                 <thead class="bg-slate-50 text-slate-500 uppercase tracking-wider text-xs border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-4 font-bold">Pengguna</th>
+                        <th class="px-6 py-4 font-bold">Username</th>
+                        <th class="px-6 py-4 font-bold text-center">Role</th>
+                        <th class="px-6 py-4 font-bold">Wilayah</th>
+                        <th class="px-6 py-4 font-bold text-center w-28">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($users as $user)
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                @php
+                                    $bgClass = 'bg-slate-100 text-slate-600 border-slate-200';
+                                    $icon = 'fas fa-user';
+                                    if($user->role == 'admin') { 
+                                        $bgClass = 'bg-rose-100 text-rose-600 border-rose-200'; 
+                                        $icon = 'fas fa-user-cog'; 
+                                    } elseif($user->role == 'kades') { 
+                                        $bgClass = 'bg-blue-100 text-blue-600 border-blue-200'; 
+                                        $icon = 'fas fa-user-tie'; 
+                                    } elseif($user->role == 'kadus') { 
+                                        $bgClass = 'bg-emerald-100 text-emerald-600 border-emerald-200'; 
+                                        $icon = 'fas fa-user-tag'; 
+                                    }
+                                @endphp
+                                <div class="h-9 w-9 rounded-full flex items-center justify-center text-xs border {{ $bgClass }}">
+                                    <i class="{{ $icon }}"></i>
+                                </div>
+                                <span class="font-bold text-slate-800">{{ $user->nama_lengkap }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 font-mono text-slate-600">
+                            {{ $user->username }}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            @if($user->role == 'admin') 
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700">ADMIN</span>
+                            @elseif($user->role == 'kades') 
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">KADES</span>
+                            @elseif($user->role == 'kadus') 
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">KADUS</span>
+                            @else 
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">WARGA</span> 
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
+                             @if($user->dusun)
+                                <span class="inline-flex items-center gap-1.5 text-slate-700 font-medium">
+                                    <i class="fas fa-map-marker-alt text-rose-500"></i> {{ $user->dusun->nama_dusun }}
+                                </span>
+                            @else
+                                <span class="text-slate-400">-</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{{ route('users.edit', $user->id_user) }}" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @if($user->id_user != Auth::id())
+                                    <form action="{{ route('users.destroy', $user->id_user) }}" method="POST" onsubmit="return confirm('Yakin hapus user ini?');">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                             <div class="flex flex-col items-center justify-center">
+                                <i class="fas fa-users-slash text-4xl mb-3 opacity-20"></i>
+                                <p>Belum ada data pengguna.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mobile View -->
+        <div class="md:hidden divide-y divide-slate-100">
+             @forelse($users as $user)
+             <div class="p-4 space-y-3">
+                <div class="flex items-start justify-between">
+                     <div class="flex items-center gap-3">
+                        @php
+                            $bgClass = 'bg-slate-100 text-slate-600 border-slate-200';
+                            $icon = 'fas fa-user';
+                            if($user->role == 'admin') { $bgClass = 'bg-rose-100 text-rose-600 border-rose-200'; }
+                            elseif($user->role == 'kades') { $bgClass = 'bg-blue-100 text-blue-600 border-blue-200'; }
+                            elseif($user->role == 'kadus') { $bgClass = 'bg-emerald-100 text-emerald-600 border-emerald-200'; }
+                        @endphp
+                        <div class="h-10 w-10 rounded-full flex items-center justify-center text-sm border {{ $bgClass }}">
+                            <i class="{{ $icon }}"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">{{ $user->nama_lengkap }}</h3>
+                            <p class="text-xs text-slate-500 font-mono">{{ $user->username }}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-bold px-2 py-1 rounded bg-slate-100 text-slate-600">
+                        {{ strtoupper($user->role) }}
+                    </span>
+                </div>
+
+                @if($user->dusun)
+                    <div class="ml-12 text-sm text-slate-700 flex items-center gap-1.5">
+                        <i class="fas fa-map-marker-alt text-rose-500"></i> {{ $user->dusun->nama_dusun }}
+                    </div>
+                @endif
+
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-50 ml-12">
+                    <a href="{{ route('users.edit', $user->id_user) }}" class="flex-1 py-2 bg-amber-50 text-amber-700 text-center rounded-lg text-sm font-medium hover:bg-amber-100">
+                        Edit
+                    </a>
+                    @if($user->id_user != Auth::id())
+                        <form action="{{ route('users.destroy', $user->id_user) }}" method="POST" class="flex-1" onsubmit="return confirm('Yakin hapus user ini?');">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="w-full py-2 bg-red-50 text-red-700 text-center rounded-lg text-sm font-medium hover:bg-red-100">
+                                Hapus
+                            </button>
+                        </form>
+                    @endif
+                </div>
+             </div>
+             @empty
+             <div class="p-8 text-center text-slate-400">
+                 <p>Tidak ditemukan data.</p>
+             </div>
+             @endforelse
+        </div>
+    </div>
+</div>
 @endsection
