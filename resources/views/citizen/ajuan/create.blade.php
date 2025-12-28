@@ -1,248 +1,230 @@
 @extends('layouts.citizen')
 
-@section('title', 'Buat Ajuan Surat Baru')
+@section('title', 'Buat Pengajuan Baru')
 
 @section('content')
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-
-            {{-- Tampilkan Error Validasi --}}
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form action="{{ route('warga.ajuan.store') }}" method="POST">
-                @csrf
-
-                <div class="alert alert-info mb-4">
-                    <h6 class="alert-heading fw-bold"><i class="fas fa-user-circle me-1"></i> Informasi Pemohon</h6>
-                    <p class="mb-0 small">
-                        NIK: <strong>{{ $warga->nik }}</strong> | Nama: <strong>{{ $warga->nama_lengkap }}</strong>
-                    </p>
-                </div>
-
-                {{-- 1. PILIH JENIS SURAT --}}
-                <div class="mb-3">
-                    <label for="id_jenis_surat" class="form-label fw-bold">Pilih Jenis Surat</label>
-                    <select class="form-select" id="id_jenis_surat" name="id_jenis_surat" required>
-                        <option value="">-- Silakan Pilih Surat --</option>
-                        @foreach ($jenisSuratList as $surat)
-                            <option value="{{ $surat->id_jenis_surat }}">
-                                {{ $surat->nama_surat }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="form-text text-primary">
-                        <i class="fas fa-info-circle me-1"></i> Pilih jenis surat di atas, formulir isian akan muncul otomatis di bawah.
+    <div class="max-w-4xl mx-auto">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            
+            <div class="p-6 md:p-8">
+                
+                {{-- Error Validation --}}
+                @if ($errors->any())
+                    <div class="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-sm">
+                        <div class="font-bold flex items-center gap-2 mb-2">
+                            <i class="fas fa-exclamation-triangle"></i> Terjadi Kesalahan:
+                        </div>
+                        <ul class="list-disc list-inside space-y-1 ml-1 text-rose-500">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                </div>
+                @endif
 
-                {{-- ================================================= --}}
-                {{-- AREA FORM DINAMIS (Awalnya Tersembunyi / d-none) --}}
-                {{-- ================================================= --}}
+                <form action="{{ route('warga.ajuan.store') }}" method="POST">
+                    @csrf
 
-                {{-- A. FORM KHUSUS SKU (Usaha) --}}
-                <div class="card bg-light border-0 mb-3 d-none extra-form" id="form_sku">
-                    <div class="card-body">
-                        <h6 class="text-primary fw-bold"><i class="fas fa-store me-1"></i> Detail Usaha</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Jenis/Bidang Usaha</label>
-                                    <input type="text" class="form-control input-extra" name="bidang_usaha"
-                                        placeholder="Contoh: Kuliner / Pertanian">
+                    <!-- User Info Alert -->
+                    <div class="mb-8 p-4 rounded-xl bg-indigo-50 border border-indigo-100 flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                            <i class="fas fa-user-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-bold text-indigo-900 text-sm uppercase tracking-wide mb-1">Informasi Pemohon</h6>
+                            <p class="text-indigo-700 text-sm">
+                                NIK: <span class="font-semibold">{{ $warga->nik }}</span> <span class="mx-2">•</span> 
+                                Nama: <span class="font-semibold">{{ $warga->nama_lengkap }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        
+                        {{-- 1. PILIH JENIS SURAT --}}
+                        <div>
+                            <label for="id_jenis_surat" class="block text-sm font-bold text-slate-700 mb-2">
+                                Pilih Jenis Surat <span class="text-rose-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select id="id_jenis_surat" name="id_jenis_surat" required
+                                    class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all appearance-none cursor-pointer">
+                                    <option value="">-- Silakan Pilih Surat --</option>
+                                    @foreach ($jenisSuratList as $surat)
+                                        <option value="{{ $surat->id_jenis_surat }}">
+                                            {{ $surat->nama_surat }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                                    <i class="fas fa-chevron-down text-xs"></i>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Nama Usaha (Opsional)</label>
-                                    <input type="text" class="form-control input-extra" name="nama_usaha"
-                                        placeholder="Contoh: Warung Makan Berkah">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Alamat/Lokasi Usaha</label>
-                                    <input type="text" class="form-control input-extra" name="lokasi_usaha"
-                                        placeholder="Contoh: Dusun I, Desa Panggulo">
+                            <p class="mt-2 text-xs text-brand-600 flex items-center gap-1.5">
+                                <i class="fas fa-info-circle"></i> Pilih jenis surat di atas, formulir isian akan muncul otomatis di bawah.
+                            </p>
+                        </div>
+
+                        {{-- ================================================= --}}
+                        {{-- AREA FORM DINAMIS (Awalnya Tersembunyi / hidden) --}}
+                        {{-- ================================================= --}}
+
+                        {{-- A. FORM KHUSUS SKU (Usaha) --}}
+                        <div class="hidden extra-form" id="form_sku">
+                            <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 border-l-4 border-l-brand-500">
+                                <h6 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-store text-brand-500"></i> Detail Usaha
+                                </h6>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Jenis/Bidang Usaha</label>
+                                        <input type="text" name="bidang_usaha" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Kuliner / Pertanian">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Nama Usaha (Opsional)</label>
+                                        <input type="text" name="nama_usaha" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Warung Makan Berkah">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Alamat/Lokasi Usaha</label>
+                                        <input type="text" name="lokasi_usaha" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Dusun I, Desa Panggulo">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {{-- 2. FORM KHUSUS SKTM --}}
-                <div class="card bg-light border-0 mb-3 d-none extra-form" id="form_sktm">
-                    <div class="card-body">
-                        <h6 class="text-primary fw-bold"><i class="fas fa-wallet me-1"></i> Detail Ekonomi</h6>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Penghasilan Rata-rata (Per Bulan)</label>
-                                    <input type="text" class="form-control input-extra" name="penghasilan"
-                                        placeholder="Contoh: Rp 500.000">
+                        {{-- B. FORM KHUSUS SKTM --}}
+                        <div class="hidden extra-form" id="form_sktm">
+                            <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 border-l-4 border-l-brand-500">
+                                <h6 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-wallet text-brand-500"></i> Detail Ekonomi
+                                </h6>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1.5">Penghasilan Rata-rata (Per Bulan)</label>
+                                    <input type="text" name="penghasilan" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Rp 500.000">
                                 </div>
-                            </div>
-
-                            {{-- KITA HAPUS INPUT INI KARENA SUDAH OTOMATIS --}}
-                            {{--
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label>Jumlah Tanggungan Keluarga</label>
-                                    <input type="number" name="jumlah_tanggungan">
-                                </div>
-                            </div>
-                            --}}
-
-                            {{-- GANTI DENGAN INFO --}}
-                            <div class="col-12">
-                                <small class="text-muted fst-italic">
-                                    * Jumlah tanggungan akan dihitung otomatis berdasarkan data Kartu Keluarga Anda di
-                                    sistem.
-                                </small>
+                                <p class="mt-2 text-xs text-slate-400 italic">
+                                    * Jumlah tanggungan akan dihitung otomatis berdasarkan data Kartu Keluarga Anda di sistem.
+                                </p>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {{-- C. FORM KHUSUS KEHILANGAN --}}
-                <div class="card bg-light border-0 mb-3 d-none extra-form" id="form_kehilangan">
-                    <div class="card-body">
-                        <h6 class="text-primary fw-bold"><i class="fas fa-search me-1"></i> Detail Kehilangan</h6>
-                        <div class="mb-2">
-                            <label class="form-label small fw-bold">Barang/Dokumen yang Hilang</label>
-                            <input type="text" class="form-control input-extra" name="barang_hilang"
-                                placeholder="Contoh: KTP, SIM, atau ATM">
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small fw-bold">Lokasi & Waktu Kejadian</label>
-                            <input type="text" class="form-control input-extra" name="lokasi_kehilangan"
-                                placeholder="Contoh: Pasar Sentral, Hari Senin jam 10 pagi">
-                        </div>
-                    </div>
-                </div>
-
-                {{-- D. FORM KHUSUS KEMATIAN --}}
-                <div class="card bg-light border-0 mb-3 d-none extra-form" id="form_kematian">
-                    <div class="card-body">
-                        <h6 class="text-primary fw-bold"><i class="fas fa-book-dead me-1"></i> Detail Kematian</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Hari Meninggal</label>
-                                    <input type="text" class="form-control input-extra" name="hari_meninggal"
-                                        placeholder="Contoh: Senin">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Tanggal Meninggal</label>
-                                    <input type="date" class="form-control input-extra" name="tgl_meninggal">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Penyebab Kematian</label>
-                                    <input type="text" class="form-control input-extra" name="penyebab_kematian"
-                                        placeholder="Contoh: Sakit Tua">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-2">
-                                    <label class="form-label small fw-bold">Tempat Meninggal</label>
-                                    <input type="text" class="form-control input-extra" name="tempat_meninggal"
-                                        placeholder="Contoh: Rumah Sakit">
+                        {{-- C. FORM KHUSUS KEHILANGAN --}}
+                        <div class="hidden extra-form" id="form_kehilangan">
+                            <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 border-l-4 border-l-brand-500">
+                                <h6 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-search text-brand-500"></i> Detail Kehilangan
+                                </h6>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Barang/Dokumen yang Hilang</label>
+                                        <input type="text" name="barang_hilang" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: KTP, SIM, atau ATM">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Lokasi & Waktu Kejadian</label>
+                                        <input type="text" name="lokasi_kehilangan" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Pasar Sentral, Hari Senin jam 10 pagi">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {{-- 5. FORM KHUSUS MENUMPANG --}}
-                <div class="card bg-light border-0 mb-3 d-none extra-form" id="form_menumpang">
-                    <div class="card-body">
-                        <h6 class="text-primary fw-bold"><i class="fas fa-home me-1"></i> Detail Tempat Tinggal</h6>
-                        <div class="form-group">
-                            <label class="form-label small fw-bold">Nama Orang Tua / Pemilik Rumah</label>
-                            <input type="text" class="form-control input-extra" name="nama_pemilik_rumah"
-                                placeholder="Contoh: Budi Santoso (Ayah)">
-                            <small class="text-muted">Masukkan nama lengkap orang tua atau pemilik rumah yang Anda
-                                tumpangi.</small>
+                        {{-- D. FORM KHUSUS KEMATIAN --}}
+                        <div class="hidden extra-form" id="form_kematian">
+                            <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 border-l-4 border-l-brand-500">
+                                <h6 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-book-dead text-brand-500"></i> Detail Kematian
+                                </h6>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Hari Meninggal</label>
+                                        <input type="text" name="hari_meninggal" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Senin">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Tanggal Meninggal</label>
+                                        <input type="date" name="tgl_meninggal" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Penyebab Kematian</label>
+                                        <input type="text" name="penyebab_kematian" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Sakit Tua">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-1.5">Tempat Meninggal</label>
+                                        <input type="text" name="tempat_meninggal" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Rumah Sakit">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- E. FORM KHUSUS MENUMPANG --}}
+                        <div class="hidden extra-form" id="form_menumpang">
+                            <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 border-l-4 border-l-brand-500">
+                                <h6 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <i class="fas fa-home text-brand-500"></i> Detail Tempat Tinggal
+                                </h6>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1.5">Nama Orang Tua / Pemilik Rumah</label>
+                                    <input type="text" name="nama_pemilik_rumah" class="input-extra w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none" placeholder="Contoh: Budi Santoso (Ayah)">
+                                    <p class="mt-1 text-xs text-slate-400">Masukkan nama lengkap orang tua atau pemilik rumah yang Anda tumpangi.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- BATAS AKHIR FORM DINAMIS --}}
+
+                        {{-- 2. KEPERLUAN --}}
+                        <div>
+                            <label for="keperluan" class="block text-sm font-bold text-slate-700 mb-2">
+                                Keperluan Surat <span class="text-rose-500">*</span>
+                            </label>
+                            <textarea id="keperluan" name="keperluan" rows="3" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all placeholder-slate-400"
+                                placeholder="Contoh: Persyaratan Melamar Pekerjaan">{{ old('keperluan') }}</textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+                            <a href="{{ route('warga.dashboard') }}" class="px-6 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors">
+                                Batal
+                            </a>
+                            <button type="submit" class="px-8 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-200 hover:shadow-brand-300 transform transition-all active:scale-95 flex items-center gap-2">
+                                <i class="fas fa-paper-plane text-sm"></i>
+                                <span>Kirim Permohonan</span>
+                            </button>
                         </div>
                     </div>
-                </div>
 
-                {{-- ================================================= --}}
-                {{-- BATAS AKHIR FORM DINAMIS --}}
-                {{-- ================================================= --}}
+                </form>
 
-                {{-- 2. KEPERLUAN (Wajib untuk semua surat) --}}
-                <div class="mb-3">
-                    <label for="keperluan" class="form-label fw-bold">
-                        Keperluan Surat <span class="text-danger">*</span>
-                    </label>
-                    <textarea class="form-control" id="keperluan" name="keperluan" rows="3"
-                        placeholder="Contoh: Persyaratan Melamar Pekerjaan" required>{{ old('keperluan') }}</textarea>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <a href="{{ route('warga.dashboard') }}" class="btn btn-secondary text-white"
-                        style="text-decoration: none;">Batal</a>
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="fas fa-paper-plane me-2"></i>Kirim Permohonan
-                    </button>
-                </div>
-            </form>
-
+            </div>
         </div>
     </div>
+
 @endsection
 
-{{-- SCRIPT UNTUK MENGATUR FORM DINAMIS --}}
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
             // Saat dropdown berubah
             $('#id_jenis_surat').change(function () {
-
-                // 1. Ambil teks pilihan dan ubah ke huruf kecil
                 var selectedText = $(this).find("option:selected").text().toLowerCase();
 
-                // 2. RESET: Sembunyikan SEMUA form tambahan & Kosongkan isinya
-                $('.extra-form').addClass('d-none').removeClass('animate__animated animate__fadeInUp');
+                // 1. RESET: Sembunyikan SEMUA form (tambah class hidden), Hapus animasi
+                $('.extra-form').addClass('hidden').removeClass('animate__animated animate__fadeInUp');
                 $('.input-extra').val('');
 
-                // 3. LOGIKA DETEKSI (Tambahkan logika 'menumpang' di sini)
+                // 2. TAMPILKAN Form Sesuai Kondisi
+                var targetId = '';
+                if (selectedText.includes('usaha')) targetId = '#form_sku';
+                else if (selectedText.includes('miskin') || selectedText.includes('tidak mampu') || selectedText.includes('sktm')) targetId = '#form_sktm';
+                else if (selectedText.includes('hilang') || selectedText.includes('kehilangan')) targetId = '#form_kehilangan';
+                else if (selectedText.includes('mati') || selectedText.includes('meninggal')) targetId = '#form_kematian';
+                else if (selectedText.includes('menumpang')) targetId = '#form_menumpang';
 
-                // SKU
-                if (selectedText.includes('usaha')) {
-                    $('#form_sku').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
+                // Jika ada target, tampilkan + animasi
+                if (targetId) {
+                    $(targetId).removeClass('hidden').addClass('animate__animated animate__fadeInUp');
                 }
-                // SKTM
-                else if (selectedText.includes('miskin') || selectedText.includes('tidak mampu') || selectedText.includes('sktm')) {
-                    $('#form_sktm').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
-                }
-                // Kehilangan
-                else if (selectedText.includes('hilang') || selectedText.includes('kehilangan')) {
-                    $('#form_kehilangan').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
-                }
-                // Kematian
-                else if (selectedText.includes('mati') || selectedText.includes('meninggal')) {
-                    $('#form_kematian').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
-                }
-                // --- TAMBAHAN BARU UNTUK MENUMPANG ---
-                else if (selectedText.includes('menumpang')) {
-                    $('#form_menumpang').removeClass('d-none').addClass('animate__animated animate__fadeInUp');
-                }
-
             });
         });
     </script>

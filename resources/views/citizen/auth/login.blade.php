@@ -1,80 +1,74 @@
 @extends('layouts.guest')
 
-@section('title', 'Login')
+@section('title', 'Login Warga')
 
 @section('content')
 
-{{-- PERUBAHAN GRID SYSTEM --}}
-{{-- col-12: HP Penuh --}}
-{{-- col-sm-10: Tablet Kecil agak tengah --}}
-{{-- col-md-6: Tablet Besar setengah layar --}}
-{{-- col-lg-4: Laptop sepertiga layar --}}
-
-<div class="col-12 col-sm-10 col-md-6 col-lg-4">
-    
-    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
         
-        <div class="card-header bg-primary text-white text-center py-3 border-0" 
-             style="background: linear-gradient(45deg, #0d6efd, #0a58ca);">
-            <div class="mb-1">
-                <i class="fas fa-landmark fa-2x"></i>
+        <!-- Header -->
+        <div class="bg-indigo-600 px-8 py-6 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 mb-3 text-white backdrop-blur-sm">
+                <i class="fas fa-university text-2xl"></i>
             </div>
-            <h5 class="fw-bold mb-0">SIPANDA</h5>
-            <small class="text-white-50" style="font-size: 0.75rem;">Sistem Pelayanan Administrasi Desa Panggulo</small>
+            <h1 class="text-2xl font-bold text-white tracking-tight">SIPANDA</h1>
+            <p class="text-indigo-100 text-sm mt-1 opacity-90">Sistem Pelayanan Administrasi Desa</p>
         </div>
 
-        <div class="card-body p-4 bg-white">
+        <!-- Body -->
+        <div class="p-8">
             
             @if ($errors->any())
-                <div class="alert alert-danger py-2 small border-0 shadow-sm rounded-3 mb-3">
-                    <i class="fas fa-exclamation-circle me-1"></i> {{ $errors->first() }}
+                <div class="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm mb-6 flex items-start gap-3">
+                    <i class="fas fa-exclamation-circle mt-0.5"></i>
+                    <span>{{ $errors->first() }}</span>
                 </div>
             @endif
 
-            <form action="{{ route('warga.login.submit') }}" method="POST">
+            <form action="{{ route('warga.login.submit') }}" method="POST" class="space-y-5">
                 @csrf
                 
-                <div class="form-group mb-3">
-                    <label class="form-label small text-muted fw-bold mb-1">USERNAME / NIK</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-primary">
-                            <i class="fas fa-id-card"></i>
-                        </span>
-                        <input type="text" class="form-control bg-light border-start-0 ps-0" 
-                               id="username" name="username" 
-                               value="{{ old('username') }}" 
-                               placeholder="Masukkan NIK" required>
+                <div>
+                    <label for="username" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">NIK / Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-id-card text-slate-400"></i>
+                        </div>
+                        <input type="text" id="username" name="username" value="{{ old('username') }}" 
+                               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-400 font-medium"
+                               placeholder="Masukkan NIK Anda" required>
                     </div>
                 </div>
 
-                <div class="form-group mb-4">
-                    <label class="form-label small text-muted fw-bold mb-1">PASSWORD</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-primary">
-                            <i class="fas fa-lock"></i>
-                        </span>
-                        <input type="password" class="form-control bg-light border-start-0 ps-0" 
-                               id="password" name="password" 
-                               placeholder="Masukkan Password" required>
-                        <button class="btn btn-light border border-start-0 btn-toggle-password" type="button">
-                            <i class="fas fa-eye text-muted"></i>
+                <div>
+                    <label for="password" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-slate-400"></i>
+                        </div>
+                        <input type="password" id="password" name="password" 
+                               class="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-400 font-medium"
+                               placeholder="Masukkan password..." required>
+                        <button type="button" onclick="togglePassword('password', 'toggle-icon')" 
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-indigo-600 transition-colors">
+                            <i id="toggle-icon" class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary fw-bold shadow-sm rounded-3 py-2">
-                        MASUK <i class="fas fa-sign-in-alt ms-2"></i>
-                    </button>
-                </div>
+                <button type="submit" 
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transform transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2">
+                    <span>Masuk Aplikasi</span>
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </button>
 
             </form>
         </div>
         
-        <div class="card-footer bg-light text-center py-2 border-0">
-            <small class="text-muted" style="font-size: 0.75rem;">Belum punya akun? Hubungi Kantor Desa.</small>
+        <div class="bg-slate-50 px-8 py-4 text-center border-t border-slate-100">
+            <p class="text-xs text-slate-500">Belum punya akun? <br>Silakan hubungi <strong class="text-slate-700">Kantor Desa</strong> untuk pendaftaran.</p>
         </div>
+
     </div>
 
-</div>
 @endsection
