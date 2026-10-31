@@ -213,7 +213,7 @@
                 <div>
                    <h3 class="font-bold text-lg mb-1">Informasi Sistem</h3>
                    <p class="text-indigo-200 text-sm max-w-xl leading-relaxed">
-                       Sistem Pelayanan Administrasi Desa (SIPANDA) Desa Panggulo.
+                       Sistem Pelayanan Administrasi Desa (SIPANDA).
                        Pastikan untuk selalu meninjau data sebelum melakukan konfirmasi persetujuan surat.
                    </p>
                 </div>
